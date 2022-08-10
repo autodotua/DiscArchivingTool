@@ -10,6 +10,12 @@ namespace DiscArchivingTool
 {
     public class FileUtility
     {
+       public const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        public void StopExporting()
+        {
+            stoppingExport = true;
+        }
+        private bool stoppingExport = false;
         List<FileInfo> filesOrderedByTime = new List<FileInfo>();
 
         public DiscFilePackageCollection Packages { get; private set; }
@@ -69,26 +75,59 @@ namespace DiscArchivingTool
             Packages = packages;
         }
 
-        public void Export(string distDir)
+        public async Task ExportAsync(string distDir, Func<string, Task<ErrorOperation>> error)
         {
             if (!Directory.Exists(distDir))
             {
                 Directory.CreateDirectory(distDir);
             }
 
+            stoppingExport = false;
             foreach (var package in Packages.DiscFilePackages)
             {
                 string dir = Path.Combine(distDir, package.Index.ToString());
                 Directory.CreateDirectory(dir);
                 using var fileListStream = File.OpenWrite(Path.Combine(dir, "filelist.txt"));
                 using var writer = new StreamWriter(fileListStream);
+
+                writer.WriteLine($"{package.EarliestTime.ToString(DateTimeFormat)}\t{package.LatestTime.ToString(DateTimeFormat)}\t{package.TotalSize}");
+
                 foreach (var file in package.Files)
                 {
-                    string relativePath = Path.GetRelativePath(sourceDir, file.Path);
-                    string newName = relativePath.Replace(":", "#c#").Replace("\\", "#s#");
-                    string md5 = CopyAndGetHash(file.Path, Path.Combine(dir, newName));
-                    MessageReceived?.Invoke(this, new MessageEventArgs() { Message = $"正在复制第 {package.Index} 个光盘文件包中的 {relativePath}" });
-                    writer.WriteLine($"{newName}\t{relativePath}\t{md5}");
+                    bool retry = false;
+                    bool abort = false;
+                    do
+                    {
+                        string relativePath = "";
+                        try
+                        {
+                            relativePath = Path.GetRelativePath(sourceDir, file.Path);
+                            string newName = relativePath.Replace(":", "#c#").Replace("\\", "#s#");
+                            MessageReceived?.Invoke(this, new MessageEventArgs() { Message = $"正在复制第 {package.Index} 个光盘文件包中的 {relativePath}" });
+                            string md5 = CopyAndGetHash(file.Path, Path.Combine(dir, newName));
+
+                            writer.WriteLine($"{newName}\t{relativePath}\t{file.LastWriteTime.ToString(DateTimeFormat)}\t{md5}");
+                        }
+                        catch (Exception ex)
+                        {
+                            var op =await error($"文件{relativePath}导出失败：{ex.Message}");
+                            switch (op)
+                            {
+                                case ErrorOperation.Retry:
+                                    retry = true;
+                                    break;
+                                case ErrorOperation.Abort:
+                                    abort = true;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    } while (retry);
+                    if (abort || stoppingExport)
+                    {
+                        throw new OperationCanceledException();
+                    }
                 }
             }
         }

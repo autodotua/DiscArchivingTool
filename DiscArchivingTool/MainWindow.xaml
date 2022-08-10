@@ -21,6 +21,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ui:SimpleStackPanel
+            x:Name="stkConfig"
             Margin="8"
             Spacing="8">
             <Grid>
@@ -85,6 +86,7 @@
                 Spacing="8">
 
                 <Button
+                    x:Name="btnCheck"
                     Padding="32,4"
                     Click="CheckButton_Click"
                     Content="检测" />
@@ -92,9 +94,9 @@
         </ui:SimpleStackPanel>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="360" />
                 <ColumnDefinition Width="8" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <GridSplitter
                 Grid.Column="1"
@@ -105,7 +107,64 @@
             <ListView
                 ItemsSource="{Binding DiscFilePackages.DiscFilePackages}"
                 SelectedItem="{Binding SelectedPackage}">
-                <ListView.View>
+                <ListView.Resources>
+                    <ContextMenu x:Key="ItemContextMenu">
+                        <MenuItem
+                            Click="CopyPackageTime"
+                            Header="复制最早时间"
+                            Tag="1" />
+                        <MenuItem
+                            Click="CopyPackageTime"
+                            Header="复制最晚时间"
+                            Tag="2" />
+                    </ContextMenu>
+                </ListView.Resources>
+                <ListView.ItemContainerStyle>
+                    <Style
+                        BasedOn="{StaticResource DefaultListViewItemStyle}"
+                        TargetType="{x:Type ListViewItem}">
+                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <ui:SimpleStackPanel
+                                        Margin="0,8"
+                                        Spacing="4">
+                                        <ui:SimpleStackPanel
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <Ellipse
+                                                Width="6 "
+                                                Height="6"
+                                                Fill="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
+                                            <TextBlock
+                                                Width="36"
+                                                FontWeight="Bold"
+                                                Text="{Binding Index}" />
+                                            <TextBlock Width="108">
+                                                <Run>共</Run>
+                                                <Run Text="{Binding Files.Count, Mode=OneWay}" />
+                                                <Run>个文件</Run>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding TotalSize, Converter={StaticResource FileLength2StringConverter}}" />
+                                        </ui:SimpleStackPanel>
+                                        <ui:SimpleStackPanel
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+
+                                            <TextBlock
+                                                Width="165"
+                                                Text="{Binding EarliestTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
+                                            <TextBlock Text="{Binding LatestTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
+                                        </ui:SimpleStackPanel>
+                                    </ui:SimpleStackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+                <!--<ListView.View>
                     <GridView>
                         <GridViewColumn
                             DisplayMemberBinding="{Binding Index}"
@@ -123,7 +182,7 @@
                             DisplayMemberBinding="{Binding TotalSize, Converter={StaticResource FileLength2StringConverter}}"
                             Header="总大小" />
                     </GridView>
-                </ListView.View>
+                </ListView.View>-->
             </ListView>
 
             <ListView
@@ -174,12 +233,23 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock
                 VerticalAlignment="Center"
                 Text="{Binding Message}" />
             <Button
+                x:Name="btnStopExport"
                 Grid.Column="2"
+                Padding="32,4"
+                HorizontalAlignment="Right"
+                Click="StopExportButton_Click"
+                Content="停止"
+                IsEnabled="False" />
+            <Button
+                x:Name="btnExport"
+                Grid.Column="4"
                 Padding="32,4"
                 HorizontalAlignment="Right"
                 Click="ExportButton_Click"
