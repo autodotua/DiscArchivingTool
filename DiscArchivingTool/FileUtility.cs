@@ -136,7 +136,7 @@ namespace DiscArchivingTool
         {
             int bufferSize = 1024 * 1024;
             MD5 md5 = MD5.Create();
-            using FileStream fileStream = new FileStream(to, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+            using FileStream fileStream = new FileStream(to, FileMode.Create, FileAccess.Write, FileShare.None);
             using FileStream fs = new FileStream(from, FileMode.Open, FileAccess.ReadWrite);
             fileStream.SetLength(fs.Length);
             int bytesRead = -1;
