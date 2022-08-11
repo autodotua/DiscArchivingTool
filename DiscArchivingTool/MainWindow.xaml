@@ -64,7 +64,7 @@
                 <local:PackingPanel />
             </TabItem>
             <TabItem Header="重建">
-                根据光盘中平铺的文件，重新生成原始的文件树
+                <local:RebuildPanel/>
             </TabItem>
             <TabItem Header="验证">
                 验证光盘中的文件完整性

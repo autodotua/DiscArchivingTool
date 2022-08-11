@@ -151,8 +151,9 @@ namespace DiscArchivingTool
 
     public class PackingPanelViewModel : INotifyPropertyChanged
     {
+        private string blackList = $"Thumbs.db{Environment.NewLine}desktop.ini";
         private bool createISO;
-        private string dir = @"O:\旧事重提\出行\个人-宁波\20220522-天一广场等";
+        private string dir = @"C:\图吧工具箱";
         private List<DiscFilePackage> discFilePackages;
 
         private int discSize = 4480;
@@ -165,6 +166,14 @@ namespace DiscArchivingTool
         private DiscFilePackage selectedPackage;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public string BlackList
+        {
+            get => blackList;
+            set => this.SetValueAndNotify(ref blackList, value, nameof(BlackList));
+        }
+
+        public bool BlackListUseRegex { get; set; } = false;
 
         public bool CreateISO
         {
@@ -211,16 +220,6 @@ namespace DiscArchivingTool
             get => selectedPackage;
             set => this.SetValueAndNotify(ref selectedPackage, value, nameof(SelectedPackage));
         }
-
-        private string blackList = $"Thumbs.db{Environment.NewLine}desktop.ini";
-        public string BlackList
-        {
-            get => blackList;
-            set => this.SetValueAndNotify(ref blackList, value, nameof(BlackList));
-        }
-
-        public bool BlackListUseRegex { get; set; } = false;
-
     }
 
 }

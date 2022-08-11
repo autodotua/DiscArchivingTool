@@ -248,7 +248,8 @@
         <Grid
             x:Name="grdBottom"
             Grid.Row="99"
-            Margin="8">
+            Margin="8"
+            IsEnabled="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -279,8 +280,7 @@
                 Padding="32,4"
                 HorizontalAlignment="Right"
                 Click="ExportButton_Click"
-                Content="导出"
-                IsEnabled="False" />
+                Content="导出" />
         </Grid>
     </Grid>
 
