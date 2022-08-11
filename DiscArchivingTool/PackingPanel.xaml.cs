@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using ModernWpf.FzExtension.CommonDialog;
 using DiscArchivingTool;
+using static DiscArchivingTool.App;
 
 namespace DiscArchivingTool
 {
@@ -14,7 +15,7 @@ namespace DiscArchivingTool
     /// </summary>
     public partial class PackingPanel : UserControl
     {
-        FileUtility fu = new FileUtility();
+        PackingUtility fu = new PackingUtility();
 
         public PackingPanel()
         {
@@ -73,7 +74,7 @@ namespace DiscArchivingTool
         {
             var tag = (sender as MenuItem).Tag as string;
             var package = (sender as MenuItem).DataContext as DiscFilePackage;
-            Clipboard.SetText((tag == "1" ? package.EarliestTime : package.LatestTime).ToString(FileUtility.DateTimeFormat));
+            Clipboard.SetText((tag == "1" ? package.EarliestTime : package.LatestTime).ToString(DateTimeFormat));
         }
 
         private async void ExportButton_Click(object sender, RoutedEventArgs e)

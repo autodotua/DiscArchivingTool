@@ -13,6 +13,10 @@ namespace DiscArchivingTool
     /// </summary>
     public partial class App : Application
     {
+        /// <summary>
+        /// 统一的日期时间格式
+        /// </summary>
+        public const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
         private void Application_Startup(object sender, StartupEventArgs e)
         {
 

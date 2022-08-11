@@ -15,12 +15,16 @@ namespace DiscArchivingTool
     /// </summary>
     public partial class RebuildPanel : UserControl
     {
-        FileUtility fu = new FileUtility();
+        RebuildUtility ru = new RebuildUtility();
 
         public RebuildPanel()
         {
             DataContext = ViewModel;
             InitializeComponent();
+            ru.MessageReceived += (s, e) =>
+            {
+                ViewModel.Message = e.Message;
+            };
         }
         public RebuildPanelViewModel ViewModel { get; } = new RebuildPanelViewModel();
 
@@ -52,7 +56,8 @@ namespace DiscArchivingTool
                 ViewModel.Message = "正在重建分析";
                 await Task.Run(() =>
                 {
-                    ViewModel.FileTree = FileUtility.RebuildAnalyze(ViewModel.InputDir);
+                    ru.ReadFileList(ViewModel.InputDir);
+                    ViewModel.FileTree = ru.BuildTree();
                 });
                 btnRebuild.IsEnabled = true;
             }
@@ -67,15 +72,28 @@ namespace DiscArchivingTool
             }
         }
 
-        private void BtnRebuild_Click(object sender, RoutedEventArgs e)
+        private async void BtnRebuild_Click(object sender, RoutedEventArgs e)
         {
+            IReadOnlyList<RebuildUtility.RebuildError> errors = null;
+            await Task.Run(() =>
+              {
+                  errors = ru.Rebuild(ViewModel.OutputDir);
+              });
 
+            if (errors.Count > 0)
+            {
+                await CommonDialog.ShowErrorDialogAsync("重建完成，但是部分文件重建失败：", string.Join(Environment.NewLine, errors.Select(p => $"{p.File.Path}：{p.Error}")));
+            }
+            else
+            {
+                await CommonDialog.ShowOkDialogAsync("重建成功");
+            }
+            ViewModel.Message = "就绪";
         }
 
         private void TreeViewItem_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var file = (sender as TreeViewItem).DataContext as FreeFileSystemTree;
-            if (file != null)
+            if ((sender as TreeViewItem).DataContext is FreeFileSystemTree file)
             {
                 if (file.IsFile)
                 {
@@ -108,7 +126,7 @@ namespace DiscArchivingTool
 
         private string message = "就绪";
 
-        private string outputDir;
+        private string outputDir= @"C:\Users\autod\Desktop\test\output";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
