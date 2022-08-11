@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:DiscArchivingTool"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -23,7 +24,7 @@
             Spacing="8">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="64" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="8" />
@@ -31,7 +32,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     VerticalAlignment="Center"
-                    Text="目录" />
+                    Text="目录：" />
                 <TextBox
                     Grid.Column="2"
                     Text="{Binding Dir}" />
@@ -42,40 +43,64 @@
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="64" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     VerticalAlignment="Center"
-                    Text="起始日期" />
+                    Text="起始日期：" />
                 <TextBox
                     Grid.Column="2"
                     Text="{Binding EarliestDateTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
                 <TextBlock
                     Grid.Column="4"
                     VerticalAlignment="Center"
-                    Text="盘片数量" />
+                    Text="盘片数量：" />
                 <ui:NumberBox
                     Grid.Column="6"
                     Value="{Binding MaxDiscCount}" />
                 <TextBlock
                     Grid.Column="8"
                     VerticalAlignment="Center"
-                    Text="单盘大小（GB）" />
+                    Text="单盘大小（GB）：" />
                 <ComboBox
                     Grid.Column="10"
                     IsEditable="True"
                     ItemsSource="{Binding DiscSizes}"
                     Text="{Binding DiscSize}" />
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="64" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="黑名单：" />
+                <TextBox
+                    Grid.Column="2"
+                    ui:ControlHelper.PlaceholderText="可以是文件名，也可以是完整路径；一行一项"
+                    AcceptsReturn="True"
+                    MaxLines="5"
+                    Text="{Binding BlackList}"
+                    VerticalScrollBarVisibility="Auto" />
+                <CheckBox
+                    Grid.Column="4"
+                    VerticalAlignment="Center"
+                    Content="使用正则表达式"
+                    IsChecked="{Binding BlackListUseRegex}" />
             </Grid>
             <ui:SimpleStackPanel
                 HorizontalAlignment="Right"
@@ -102,7 +127,7 @@
                 VerticalAlignment="Stretch"
                 Background="Transparent" />
             <ListView
-                ItemsSource="{Binding DiscFilePackages.DiscFilePackages}"
+                ItemsSource="{Binding DiscFilePackages}"
                 SelectedItem="{Binding SelectedPackage}">
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
@@ -158,6 +183,22 @@
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Index}">
+                                <DataTrigger.Value>
+                                    <sys:Int32>-1</sys:Int32>
+                                </DataTrigger.Value>
+                                <DataTrigger.Setters>
+                                    <Setter Property="ContentTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <TextBlock FontWeight="Bold">大于光盘容量的文件</TextBlock>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger.Setters>
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </ListView.ItemContainerStyle>
 
@@ -205,6 +246,7 @@
             </ListView>
         </Grid>
         <Grid
+            x:Name="grdBottom"
             Grid.Row="99"
             Margin="8">
             <Grid.ColumnDefinitions>
@@ -213,13 +255,19 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock
                 VerticalAlignment="Center"
                 Text="{Binding Message}" />
+            <CheckBox
+                Grid.Column="2  "
+                Content="生成ISO"
+                IsChecked="{Binding CreateISO}" />
             <Button
                 x:Name="btnStopExport"
-                Grid.Column="2"
+                Grid.Column="4"
                 Padding="32,4"
                 HorizontalAlignment="Right"
                 Click="StopExportButton_Click"
@@ -227,7 +275,7 @@
                 IsEnabled="False" />
             <Button
                 x:Name="btnExport"
-                Grid.Column="4"
+                Grid.Column="6"
                 Padding="32,4"
                 HorizontalAlignment="Right"
                 Click="ExportButton_Click"

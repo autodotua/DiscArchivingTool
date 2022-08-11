@@ -37,17 +37,45 @@ namespace DiscArchivingTool
 
         private async void CheckButton_Click(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() =>
+            try
             {
-                ViewModel.Message = "正在查找文件";
-                fu.EnumerateAndOrderFiles(ViewModel.Dir, ViewModel.EarliestDateTime);
-                ViewModel.Message = "正在查找文件";
-                fu.SplitToDiscs(ViewModel.DiscSize, ViewModel.MaxDiscCount);
-            });
-            ViewModel.DiscFilePackages = fu.Packages;
-            ViewModel.Message = "就绪";
-            btnExport.IsEnabled = true;
+                btnCheck.IsEnabled = false;
+                await Task.Run(() =>
+                {
+                    ViewModel.Message = "正在查找文件";
+                    fu.EnumerateAndOrderFiles(ViewModel.Dir, ViewModel.EarliestDateTime,ViewModel.BlackList,ViewModel.BlackListUseRegex);
+                    ViewModel.Message = "正在处理文件";
+                    fu.SplitToDiscs(ViewModel.DiscSize, ViewModel.MaxDiscCount);
+                });
+                var pkgs = fu.Packages.DiscFilePackages;
+                if (fu.Packages.SizeOutOfRangeFiles.Count > 0)
+                {
+                    pkgs.Add(new DiscFilePackage()
+                    {
+                        Index = -1
+                    });
+                    pkgs[^1].Files.AddRange(fu.Packages.SizeOutOfRangeFiles);
+                }
+                ViewModel.DiscFilePackages = pkgs;
+                ViewModel.Message = "就绪";
+                grdBottom.IsEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex, "查询文件失败");
+            }
+            finally
+            {
+                btnCheck.IsEnabled = true;
+            }
         }
+        private void CopyPackageTime(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as MenuItem).Tag as string;
+            var package = (sender as MenuItem).DataContext as DiscFilePackage;
+            Clipboard.SetText((tag == "1" ? package.EarliestTime : package.LatestTime).ToString(FileUtility.DateTimeFormat));
+        }
+
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -61,7 +89,14 @@ namespace DiscArchivingTool
                         if (await CommonDialog.ShowYesNoDialogAsync("清空目录",
                             $"目录{path}不为空，{Environment.NewLine}导出前将清空目录。{Environment.NewLine}是否继续？"))
                         {
-                            FzLib.IO.WindowsFileSystem.DeleteFileOrFolder(path, true, true);
+                            try
+                            {
+                                FzLib.IO.WindowsFileSystem.DeleteFileOrFolder(path, true, true);
+                            }
+                            catch (Exception ex)
+                            {
+                                return;
+                            }
                         }
                         else
                         {
@@ -78,16 +113,16 @@ namespace DiscArchivingTool
 
                             await Task.Run(async () =>
                             {
-                                await fu.ExportAsync(path, async msg =>
-                                {
-                                    var id = await CommonDialog.ShowSelectItemDialogAsync(msg, new SelectDialogItem[]
-                                    {
+                                await fu.ExportAsync(path, ViewModel.CreateISO, async msg =>
+                                 {
+                                     var id = await CommonDialog.ShowSelectItemDialogAsync(msg, new SelectDialogItem[]
+                                     {
                                        new SelectDialogItem("重试"),
                                        new SelectDialogItem("跳过"),
                                        new SelectDialogItem("终止")
-                                    });
-                                    return (ErrorOperation)id;
-                                });
+                                     });
+                                     return (ErrorOperation)id;
+                                 });
                             });
                             ViewModel.Message = "就绪";
                         }
@@ -111,39 +146,37 @@ namespace DiscArchivingTool
             fu.StopExporting();
             btnStopExport.IsEnabled = false;
         }
-
-        private void CopyPackageTime(object sender, RoutedEventArgs e)
-        {
-            var tag = (sender as MenuItem).Tag as string;
-            var package = (sender as MenuItem).DataContext as DiscFilePackage;
-            Clipboard.SetText((tag == "1" ? package.EarliestTime : package.LatestTime).ToString(FileUtility.DateTimeFormat));
-        }
     }
 
 
     public class PackingPanelViewModel : INotifyPropertyChanged
     {
+        private bool createISO;
         private string dir = @"O:\旧事重提\出行\个人-宁波\20220522-天一广场等";
-        private DiscFilePackageCollection discFilePackages;
+        private List<DiscFilePackage> discFilePackages;
 
         private int discSize = 4480;
-
         private DateTime earliestDateTime = new DateTime(2000, 1, 1);
 
         private int maxDiscCount = 1000;
 
-        private string message;
+        private string message = "就绪";
 
         private DiscFilePackage selectedPackage;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public bool CreateISO
+        {
+            get => createISO;
+            set => this.SetValueAndNotify(ref createISO, value, nameof(CreateISO));
+        }
         public string Dir
         {
             get => dir;
             set => this.SetValueAndNotify(ref dir, value, nameof(Dir));
         }
-        public DiscFilePackageCollection DiscFilePackages
+        public List<DiscFilePackage> DiscFilePackages
         {
             get => discFilePackages;
             set => this.SetValueAndNotify(ref discFilePackages, value, nameof(DiscFilePackages));
@@ -155,7 +188,7 @@ namespace DiscArchivingTool
             set => this.SetValueAndNotify(ref discSize, value, nameof(DiscSize));
         }
 
-        public int[] DiscSizes { get; } = new int[] { 700, 4480, 8500, 22000 };
+        public int[] DiscSizes { get; } = new int[] { 700, 4480, 8500, 23500 };
 
         public DateTime EarliestDateTime
         {
@@ -178,6 +211,16 @@ namespace DiscArchivingTool
             get => selectedPackage;
             set => this.SetValueAndNotify(ref selectedPackage, value, nameof(SelectedPackage));
         }
+
+        private string blackList = $"Thumbs.db{Environment.NewLine}desktop.ini";
+        public string BlackList
+        {
+            get => blackList;
+            set => this.SetValueAndNotify(ref blackList, value, nameof(BlackList));
+        }
+
+        public bool BlackListUseRegex { get; set; } = false;
+
     }
 
 }
