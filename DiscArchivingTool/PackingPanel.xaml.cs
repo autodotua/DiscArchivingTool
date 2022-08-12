@@ -176,7 +176,7 @@ namespace DiscArchivingTool
     {
         private string blackList = $"Thumbs.db{Environment.NewLine}desktop.ini";
         private bool createISO;
-        private string dir = @"C:\图吧工具箱";
+        private string dir;
         private List<DiscFilePackage> discFilePackages;
 
         private int discSize = 4480;
@@ -186,6 +186,9 @@ namespace DiscArchivingTool
 
         private string message = "就绪";
 
+        private string outputDir;
+        private double progress;
+        private double progressMax;
         private DiscFilePackage selectedPackage;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -208,14 +211,6 @@ namespace DiscArchivingTool
             get => dir;
             set => this.SetValueAndNotify(ref dir, value, nameof(Dir));
         }
-
-        private string outputDir;
-        public string OutputDir
-        {
-            get => outputDir;
-            set => this.SetValueAndNotify(ref outputDir, value, nameof(OutputDir));
-        }
-
         public List<DiscFilePackage> DiscFilePackages
         {
             get => discFilePackages;
@@ -235,33 +230,40 @@ namespace DiscArchivingTool
             get => earliestDateTime;
             set => this.SetValueAndNotify(ref earliestDateTime, value, nameof(EarliestDateTime));
         }
+
         public int MaxDiscCount
         {
             get => maxDiscCount;
             set => this.SetValueAndNotify(ref maxDiscCount, value, nameof(MaxDiscCount));
         }
+
         public string Message
         {
             get => message;
             set => this.SetValueAndNotify(ref message, value, nameof(Message));
         }
 
-        public DiscFilePackage SelectedPackage
+        public string OutputDir
         {
-            get => selectedPackage;
-            set => this.SetValueAndNotify(ref selectedPackage, value, nameof(SelectedPackage));
+            get => outputDir;
+            set => this.SetValueAndNotify(ref outputDir, value, nameof(OutputDir));
         }
-        private double progress;
         public double Progress
         {
             get => progress;
             set => this.SetValueAndNotify(ref progress, value, nameof(Progress));
         }
-        private double progressMax;
+
         public double ProgressMax
         {
             get => progressMax;
             set => this.SetValueAndNotify(ref progressMax, value, nameof(ProgressMax));
+        }
+
+        public DiscFilePackage SelectedPackage
+        {
+            get => selectedPackage;
+            set => this.SetValueAndNotify(ref selectedPackage, value, nameof(SelectedPackage));
         }
     }
 

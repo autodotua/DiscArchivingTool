@@ -142,11 +142,11 @@ namespace DiscArchivingTool
     public class RebuildPanelViewModel : INotifyPropertyChanged
     {
         private FreeFileSystemTree fileTree;
-        private string inputDir = @"C:\Users\autod\Desktop\test\1";
+        private string inputDir;
 
         private string message = "就绪";
 
-        private string outputDir = @"C:\Users\autod\Desktop\test\output";
+        private string outputDir;
 
         private double progress;
 

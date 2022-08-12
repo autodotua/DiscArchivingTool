@@ -8,7 +8,7 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="MainWindow"
     Width="1200"
-    Height="800"
+    Height="800" Closing="Window_Closing"
     ui:TitleBar.ExtendViewIntoTitleBar="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowState="Maximized"
@@ -61,10 +61,10 @@
 
         <TabControl Grid.Row="2">
             <TabItem Header="打包">
-                <local:PackingPanel />
+                <local:PackingPanel x:Name="packing" />
             </TabItem>
             <TabItem Header="重建">
-                <local:RebuildPanel/>
+                <local:RebuildPanel x:Name="rebuild" />
             </TabItem>
             <TabItem Header="验证">
                 验证光盘中的文件完整性

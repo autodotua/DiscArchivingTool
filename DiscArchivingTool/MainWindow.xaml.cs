@@ -17,14 +17,36 @@ using FzLib;
 using System.ComponentModel;
 using System.IO;
 using ModernWpf.FzExtension.CommonDialog;
+using Mapster;
+using FzLib.DataStorage.Serialization;
 
 namespace DiscArchivingTool
 {
     public partial class MainWindow : Window
     {
+        Configs config = new Configs();
+        string configPath = "configs.json";
         public MainWindow()
         {
+            try
+            {
+                config.TryLoadFromJsonFile(configPath);
+            }
+            catch (Exception ex)
+            {
+
+            }
             InitializeComponent();
+
+            config.Packing.Adapt(packing.ViewModel);
+            config.Rebuild.Adapt(rebuild.ViewModel);
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            packing.ViewModel.Adapt(config.Packing);
+            rebuild.ViewModel.Adapt(config.Rebuild);
+            config.Save(configPath);
         }
     }
 }
