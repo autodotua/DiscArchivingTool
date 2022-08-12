@@ -8,42 +8,10 @@ namespace DiscArchivingTool
     public class RebuildUtility
     {
         private Dictionary<string, List<DiscFile>> files = new Dictionary<string, List<DiscFile>>();
-        private string inputDirs;
-        public void ReadFileList(string dirs)
-        {
-            inputDirs = dirs;
-            foreach (var dir in dirs.Split('|'))
-            {
+        public event EventHandler<MessageEventArgs> MessageReceived;
 
-                string filelistName = Directory.EnumerateFiles(dir, "filelist-*.txt")
-                     .OrderByDescending(p => p)
-                     .FirstOrDefault();
-                if (filelistName == null)
-                {
-                    throw new Exception("不存在filelist，目录有误或文件缺失！");
-                }
+        public event EventHandler<ProgressUpdatedEventArgs> RebuildProgressUpdated;
 
-                var lines = File.ReadAllLines(filelistName);
-                var header = lines[0].Split('\t');
-                files.Add(dir,
-                    lines.Skip(1).Select(p =>
-             {
-                 var parts = p.Split('\t');
-                 if (parts.Length != 5)
-                 {
-                     throw new FormatException("filelist格式错误，无法解析");
-                 }
-                 return new DiscFile()
-                 {
-                     DiscName = parts[0],
-                     Path = parts[1],
-                     LastWriteTime = DateTime.ParseExact(parts[2], DateTimeFormat, CultureInfo.InvariantCulture),
-                     Length = long.Parse(parts[3]),
-                     Md5 = parts[4],
-                 };
-             }).ToList());
-            }
-        }
         /// <summary>
         /// 重建分析
         /// </summary>
@@ -84,6 +52,41 @@ namespace DiscArchivingTool
             return tree;
         }
 
+        public void ReadFileList(string dirs)
+        {
+            foreach (var dir in dirs.Split('|'))
+            {
+
+                string filelistName = Directory.EnumerateFiles(dir, "filelist-*.txt")
+                     .OrderByDescending(p => p)
+                     .FirstOrDefault();
+                if (filelistName == null)
+                {
+                    throw new Exception("不存在filelist，目录有误或文件缺失！");
+                }
+
+                var lines = File.ReadAllLines(filelistName);
+                var header = lines[0].Split('\t');
+                files.Add(dir,
+                    lines.Skip(1).Select(p =>
+             {
+                 var parts = p.Split('\t');
+                 if (parts.Length != 5)
+                 {
+                     throw new FormatException("filelist格式错误，无法解析");
+                 }
+                 var file= new DiscFile()
+                 {
+                     DiscName = parts[0],
+                     Path = parts[1],
+                     LastWriteTime = DateTime.ParseExact(parts[2], DateTimeFormat, CultureInfo.InvariantCulture),
+                     Length = long.Parse(parts[3]),
+                     Md5 = parts[4],
+                 };
+                 return file;
+             }).ToList());
+            }
+        }
         /// <summary>
         /// 进行重建
         /// </summary>
@@ -92,6 +95,8 @@ namespace DiscArchivingTool
         public IReadOnlyList<RebuildError> Rebuild(string distDir)
         {
             List<RebuildError> errorFiles = new List<RebuildError>();
+            double length = 0;
+            double totalLength = files.Values.Sum(p => p.Sum(q => q.Length));
             foreach (var dir in files.Keys)
             {
                 foreach (var file in files[dir])
@@ -114,13 +119,11 @@ namespace DiscArchivingTool
                     {
                         errorFiles.Add(new RebuildError(file, ex.Message));
                     }
+                    RebuildProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs(length += file.Length, totalLength));
                 }
             }
             return errorFiles;
         }
-
-        public event EventHandler<MessageEventArgs> MessageReceived;
-
         public class RebuildError
         {
             public RebuildError(DiscFile file, string error)
@@ -129,8 +132,8 @@ namespace DiscArchivingTool
                 Error = error;
             }
 
-            public DiscFile File { get; set; }
             public string Error { get; set; }
+            public DiscFile File { get; set; }
         }
     }
 }

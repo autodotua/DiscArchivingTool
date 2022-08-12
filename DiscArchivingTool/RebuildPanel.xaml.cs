@@ -25,6 +25,14 @@ namespace DiscArchivingTool
             {
                 ViewModel.Message = e.Message;
             };
+            ru.RebuildProgressUpdated += (s, e) =>
+            {
+                if (e.MaxValue != ViewModel.ProgressMax)
+                {
+                    ViewModel.ProgressMax = e.MaxValue;
+                }
+                ViewModel.Progress = e.Value;
+            };
         }
         public RebuildPanelViewModel ViewModel { get; } = new RebuildPanelViewModel();
 
@@ -99,6 +107,7 @@ namespace DiscArchivingTool
                 stkConfig.IsEnabled = true;
                 btnRebuild.IsEnabled = true;
                 ViewModel.Message = "就绪";
+                ViewModel.Progress = ViewModel.ProgressMax;
             }
         }
 
@@ -139,6 +148,10 @@ namespace DiscArchivingTool
 
         private string outputDir = @"C:\Users\autod\Desktop\test\output";
 
+        private double progress;
+
+        private double progressMax;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public FreeFileSystemTree FileTree
@@ -162,6 +175,17 @@ namespace DiscArchivingTool
             get => outputDir;
             set => this.SetValueAndNotify(ref outputDir, value, nameof(OutputDir));
         }
+        public double Progress
+        {
+            get => progress;
+            set => this.SetValueAndNotify(ref progress, value, nameof(Progress));
+        }
+        public double ProgressMax
+        {
+            get => progressMax;
+            set => this.SetValueAndNotify(ref progressMax, value, nameof(ProgressMax));
+        }
+
     }
 
 }

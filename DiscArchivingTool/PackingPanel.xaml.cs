@@ -25,6 +25,14 @@ namespace DiscArchivingTool
             {
                 ViewModel.Message = e.Message;
             };
+            fu.RebuildProgressUpdated += (s, e) =>
+        {
+            if (e.MaxValue != ViewModel.ProgressMax)
+            {
+                ViewModel.ProgressMax = e.MaxValue;
+            }
+            ViewModel.Progress = e.Value;
+        };
         }
         public PackingPanelViewModel ViewModel { get; } = new PackingPanelViewModel();
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
@@ -33,6 +41,14 @@ namespace DiscArchivingTool
             if (path != null)
             {
                 ViewModel.Dir = path;
+            }
+        }
+        private void BrowseOutputButton_Click(object sender, RoutedEventArgs e)
+        {
+            string path = new FileFilterCollection().CreateOpenFileDialog().GetFolderPath();
+            if (path != null)
+            {
+                ViewModel.OutputDir = path;
             }
         }
 
@@ -44,7 +60,7 @@ namespace DiscArchivingTool
                 await Task.Run(() =>
                 {
                     ViewModel.Message = "正在查找文件";
-                    fu.EnumerateAndOrderFiles(ViewModel.Dir, ViewModel.EarliestDateTime,ViewModel.BlackList,ViewModel.BlackListUseRegex);
+                    fu.EnumerateAndOrderFiles(ViewModel.Dir, ViewModel.EarliestDateTime, ViewModel.BlackList, ViewModel.BlackListUseRegex);
                     ViewModel.Message = "正在处理文件";
                     fu.SplitToDiscs(ViewModel.DiscSize, ViewModel.MaxDiscCount);
                 });
@@ -81,67 +97,69 @@ namespace DiscArchivingTool
         {
             try
             {
-                string path = new FileFilterCollection().CreateOpenFileDialog().GetFolderPath();
-                if (path != null)
+                btnExport.IsEnabled = false;
+                stkConfig.IsEnabled = false;
+                btnStopExport.IsEnabled = true;
+                bool ok = true;
+                if (Directory.EnumerateFileSystemEntries(ViewModel.OutputDir).Any())
                 {
-                    btnExport.IsEnabled = false;
-                    stkConfig.IsEnabled = false;
-                    btnStopExport.IsEnabled = true;
-                    bool ok = true;
-                    if (Directory.EnumerateFileSystemEntries(path).Any())
-                    {
-                        if (await CommonDialog.ShowYesNoDialogAsync("清空目录",
-                            $"目录{path}不为空，{Environment.NewLine}导出前将清空部分目录。{Environment.NewLine}是否继续？"))
-                        {
-                            try
-                            {
-                                foreach (var index in fu.Packages.DiscFilePackages.Where(p=>p.Checked).Select(p=>p.Index))
-                                {
-                                    FzLib.IO.WindowsFileSystem.DeleteFileOrFolder(Path.Combine(path,index.ToString()), true, true);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            ok = false;
-                        }
-                    }
-                    if (ok)
+                    if (await CommonDialog.ShowYesNoDialogAsync("清空目录",
+                        $"目录{ViewModel.OutputDir}不为空，{Environment.NewLine}导出前将清空部分目录。{Environment.NewLine}是否继续？"))
                     {
                         try
                         {
-
-                            await Task.Run(async () =>
+                            foreach (var index in fu.Packages.DiscFilePackages.Where(p => p.Checked).Select(p => p.Index))
                             {
-                                await fu.ExportAsync(path, ViewModel.CreateISO, async msg =>
-                                 {
-                                     var id = await CommonDialog.ShowSelectItemDialogAsync(msg, new SelectDialogItem[]
-                                     {
+                                FzLib.IO.WindowsFileSystem.DeleteFileOrFolder(Path.Combine(ViewModel.OutputDir, index.ToString()), true, true);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        ok = false;
+                    }
+                }
+                if (ok)
+                {
+                    try
+                    {
+
+                        await Task.Run(async () =>
+                        {
+                            await fu.ExportAsync(ViewModel.OutputDir, ViewModel.CreateISO, async msg =>
+                             {
+                                 int id = 0;
+                                 await Dispatcher.Invoke(async () =>
+                                  {
+                                      id = await CommonDialog.ShowSelectItemDialogAsync(msg, new SelectDialogItem[]
+                                    {
                                        new SelectDialogItem("重试"),
                                        new SelectDialogItem("跳过"),
                                        new SelectDialogItem("终止")
-                                     });
-                                     return (ErrorOperation)id;
-                                 });
-                            });
-                            ViewModel.Message = "就绪";
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            ViewModel.Message = "终止";
-                        }
+                                      });
+                                  });
+                                 return (ErrorOperation)id;
+                             });
+                        });
+                        ViewModel.Message = "就绪";
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        ViewModel.Message = "终止";
                     }
                 }
             }
+
             finally
             {
                 btnExport.IsEnabled = true;
                 stkConfig.IsEnabled = true;
                 btnStopExport.IsEnabled = false;
+                ViewModel.Progress = ViewModel.ProgressMax;
             }
         }
 
@@ -150,6 +168,7 @@ namespace DiscArchivingTool
             fu.StopExporting();
             btnStopExport.IsEnabled = false;
         }
+
     }
 
 
@@ -189,6 +208,14 @@ namespace DiscArchivingTool
             get => dir;
             set => this.SetValueAndNotify(ref dir, value, nameof(Dir));
         }
+
+        private string outputDir;
+        public string OutputDir
+        {
+            get => outputDir;
+            set => this.SetValueAndNotify(ref outputDir, value, nameof(OutputDir));
+        }
+
         public List<DiscFilePackage> DiscFilePackages
         {
             get => discFilePackages;
@@ -223,6 +250,18 @@ namespace DiscArchivingTool
         {
             get => selectedPackage;
             set => this.SetValueAndNotify(ref selectedPackage, value, nameof(SelectedPackage));
+        }
+        private double progress;
+        public double Progress
+        {
+            get => progress;
+            set => this.SetValueAndNotify(ref progress, value, nameof(Progress));
+        }
+        private double progressMax;
+        public double ProgressMax
+        {
+            get => progressMax;
+            set => this.SetValueAndNotify(ref progressMax, value, nameof(ProgressMax));
         }
     }
 

@@ -32,13 +32,32 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     VerticalAlignment="Center"
-                    Text="目录：" />
+                    Text="源目录：" />
                 <TextBox
                     Grid.Column="2"
                     Text="{Binding Dir}" />
                 <Button
                     Grid.Column="4"
                     Click="BrowseButton_Click"
+                    Content="浏览" />
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="64" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="导出目录：" />
+                <TextBox
+                    Grid.Column="2"
+                    Text="{Binding OutputDir}" />
+                <Button
+                    Grid.Column="4"
+                    Click="BrowseOutputButton_Click"
                     Content="浏览" />
             </Grid>
             <Grid>
@@ -254,7 +273,9 @@
             IsEnabled="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="Auto" />
@@ -262,15 +283,22 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock
+                Width="360"
                 VerticalAlignment="Center"
-                Text="{Binding Message}" />
+                Text="{Binding Message}"
+                TextTrimming="CharacterEllipsis" />
+            <ProgressBar
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Maximum="{Binding ProgressMax}"
+                Value="{Binding Progress}" />
             <CheckBox
-                Grid.Column="2  "
+                Grid.Column="4"
                 Content="生成ISO"
                 IsChecked="{Binding CreateISO}" />
             <Button
                 x:Name="btnStopExport"
-                Grid.Column="4"
+                Grid.Column="6"
                 Padding="32,4"
                 HorizontalAlignment="Right"
                 Click="StopExportButton_Click"
@@ -278,7 +306,7 @@
                 IsEnabled="False" />
             <Button
                 x:Name="btnExport"
-                Grid.Column="6"
+                Grid.Column="8"
                 Padding="32,4"
                 HorizontalAlignment="Right"
                 Click="ExportButton_Click"

@@ -137,16 +137,27 @@
             Margin="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Message}" />
+            <TextBlock
+                Width="360"
+                Text="{Binding Message}"
+                TextTrimming="WordEllipsis" />
+            <ProgressBar
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Maximum="{Binding ProgressMax}"
+                Value="{Binding Progress}" />
             <Button
                 x:Name="btnRebuild"
                 Grid.Column="99"
                 Padding="32,4"
                 Click="BtnRebuild_Click"
-                Content="重建" />
+                Content="重建"
+                IsEnabled="False" />
         </Grid>
     </Grid>
 </UserControl>
