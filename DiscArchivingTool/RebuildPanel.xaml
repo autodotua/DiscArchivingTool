@@ -19,6 +19,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ui:SimpleStackPanel
+            x:Name="stkConfig"
             Margin="8"
             Spacing="8">
             <Grid>

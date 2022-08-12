@@ -30,11 +30,12 @@ namespace DiscArchivingTool
 
         private void BrowseInputDirButton_Click(object sender, RoutedEventArgs e)
         {
-
-            string path = new FileFilterCollection().CreateOpenFileDialog().GetFolderPath();
-            if (path != null)
+            var dialog = new FileFilterCollection().CreateOpenFileDialog();
+            dialog.Multiselect = true;
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogResult.Ok)
             {
-                ViewModel.InputDir = path;
+                ViewModel.InputDir = string.Join('|', dialog.FileNames);
             }
         }
 
@@ -74,21 +75,31 @@ namespace DiscArchivingTool
 
         private async void BtnRebuild_Click(object sender, RoutedEventArgs e)
         {
-            IReadOnlyList<RebuildUtility.RebuildError> errors = null;
-            await Task.Run(() =>
-              {
-                  errors = ru.Rebuild(ViewModel.OutputDir);
-              });
+            try
+            {
+                stkConfig.IsEnabled = false;
+                btnRebuild.IsEnabled = false;
+                IReadOnlyList<RebuildUtility.RebuildError> errors = null;
+                await Task.Run(() =>
+                  {
+                      errors = ru.Rebuild(ViewModel.OutputDir);
+                  });
 
-            if (errors.Count > 0)
-            {
-                await CommonDialog.ShowErrorDialogAsync("重建完成，但是部分文件重建失败：", string.Join(Environment.NewLine, errors.Select(p => $"{p.File.Path}：{p.Error}")));
+                if (errors.Count > 0)
+                {
+                    await CommonDialog.ShowErrorDialogAsync("重建完成，但是部分文件重建失败：", string.Join(Environment.NewLine, errors.Select(p => $"{p.File.Path}：{p.Error}")));
+                }
+                else
+                {
+                    await CommonDialog.ShowOkDialogAsync("重建成功");
+                }
             }
-            else
+            finally
             {
-                await CommonDialog.ShowOkDialogAsync("重建成功");
+                stkConfig.IsEnabled = true;
+                btnRebuild.IsEnabled = true;
+                ViewModel.Message = "就绪";
             }
-            ViewModel.Message = "就绪";
         }
 
         private void TreeViewItem_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -126,7 +137,7 @@ namespace DiscArchivingTool
 
         private string message = "就绪";
 
-        private string outputDir= @"C:\Users\autod\Desktop\test\output";
+        private string outputDir = @"C:\Users\autod\Desktop\test\output";
 
         public event PropertyChangedEventHandler PropertyChanged;
 

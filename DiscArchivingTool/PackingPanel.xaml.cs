@@ -84,6 +84,9 @@ namespace DiscArchivingTool
                 string path = new FileFilterCollection().CreateOpenFileDialog().GetFolderPath();
                 if (path != null)
                 {
+                    btnExport.IsEnabled = false;
+                    stkConfig.IsEnabled = false;
+                    btnStopExport.IsEnabled = true;
                     bool ok = true;
                     if (Directory.EnumerateFileSystemEntries(path).Any())
                     {
@@ -109,9 +112,6 @@ namespace DiscArchivingTool
                     }
                     if (ok)
                     {
-                        btnExport.IsEnabled = false;
-                        stkConfig.IsEnabled = false;
-                        btnStopExport.IsEnabled = true;
                         try
                         {
 
