@@ -145,7 +145,7 @@
             <TextBlock
                 Width="360"
                 Text="{Binding Message}"
-                TextTrimming="WordEllipsis" />
+                TextTrimming="CharacterEllipsis" />
             <ProgressBar
                 Grid.Column="2"
                 VerticalAlignment="Center"

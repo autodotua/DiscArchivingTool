@@ -40,12 +40,14 @@ namespace DiscArchivingTool
 
             config.Packing.Adapt(packing.ViewModel);
             config.Rebuild.Adapt(rebuild.ViewModel);
+            config.Check.Adapt(checkout.ViewModel);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             packing.ViewModel.Adapt(config.Packing);
             rebuild.ViewModel.Adapt(config.Rebuild);
+            checkout.ViewModel.Adapt(config.Check);
             config.Save(configPath);
         }
     }

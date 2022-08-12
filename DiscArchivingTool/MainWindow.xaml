@@ -66,8 +66,8 @@
             <TabItem Header="重建">
                 <local:RebuildPanel x:Name="rebuild" />
             </TabItem>
-            <TabItem Header="验证">
-                验证光盘中的文件完整性
+            <TabItem Header="校验">
+                <local:CheckPanel x:Name="checkout"/>
             </TabItem>
             <TabItem Header="更新">
                 在文件的目录结构发生修改之后，重新建立filelist

@@ -22,11 +22,16 @@ namespace DiscArchivingTool
         }
         public PackingConfigs Packing { get; set; } = new PackingConfigs();
         public RebuildConfigs Rebuild { get; set; } = new RebuildConfigs();
+        public CheckConfigs Check { get; set; } = new CheckConfigs();
     }
     public class RebuildConfigs
     {
         public string InputDir { get; set; }
         public string OutputDir { get; set; }
+    }
+    public class CheckConfigs
+    {
+        public string Dir { get; set; }
     }
 
     public class PackingConfigs

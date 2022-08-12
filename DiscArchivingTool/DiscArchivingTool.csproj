@@ -34,12 +34,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="CheckPanel.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="RebuildPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="CheckPanel.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="RebuildPanel.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

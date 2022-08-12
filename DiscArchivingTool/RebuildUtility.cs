@@ -7,7 +7,7 @@ namespace DiscArchivingTool
 {
     public class RebuildUtility
     {
-        private Dictionary<string, List<DiscFile>> files = new Dictionary<string, List<DiscFile>>();
+        private Dictionary<string, List<DiscFile>> files;
         public event EventHandler<MessageEventArgs> MessageReceived;
 
         public event EventHandler<ProgressUpdatedEventArgs> RebuildProgressUpdated;
@@ -31,7 +31,6 @@ namespace DiscArchivingTool
                         throw new FileNotFoundException(filePath);
                     }
                     var pathParts = file.Path.Split('\\', '/');
-                    file.RawName = pathParts[^1];
                     var current = tree;
                     for (int i = 0; i < pathParts.Length - 1; i++)
                     {
@@ -54,38 +53,7 @@ namespace DiscArchivingTool
 
         public void ReadFileList(string dirs)
         {
-            foreach (var dir in dirs.Split('|'))
-            {
-
-                string filelistName = Directory.EnumerateFiles(dir, "filelist-*.txt")
-                     .OrderByDescending(p => p)
-                     .FirstOrDefault();
-                if (filelistName == null)
-                {
-                    throw new Exception("不存在filelist，目录有误或文件缺失！");
-                }
-
-                var lines = File.ReadAllLines(filelistName);
-                var header = lines[0].Split('\t');
-                files.Add(dir,
-                    lines.Skip(1).Select(p =>
-             {
-                 var parts = p.Split('\t');
-                 if (parts.Length != 5)
-                 {
-                     throw new FormatException("filelist格式错误，无法解析");
-                 }
-                 var file= new DiscFile()
-                 {
-                     DiscName = parts[0],
-                     Path = parts[1],
-                     LastWriteTime = DateTime.ParseExact(parts[2], DateTimeFormat, CultureInfo.InvariantCulture),
-                     Length = long.Parse(parts[3]),
-                     Md5 = parts[4],
-                 };
-                 return file;
-             }).ToList());
-            }
+            files = FileUtility.ReadFileList(dirs);
         }
         /// <summary>
         /// 进行重建
@@ -107,7 +75,7 @@ namespace DiscArchivingTool
                         var distPath = Path.Combine(distDir, file.Path);
                         var distFileDir = Path.GetDirectoryName(distPath);
                         var name = Path.GetFileName(file.Path);
-                        MessageReceived?.Invoke(this, new MessageEventArgs($"正在重建{file.Path}"));
+                        MessageReceived?.Invoke(this, new MessageEventArgs($"正在重建 {file.Path}"));
                         Directory.CreateDirectory(distFileDir);
                         string md5 = FileUtility.CopyAndGetHash(srcPath, distPath);
                         if (md5 != file.Md5)
