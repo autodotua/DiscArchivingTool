@@ -7,5 +7,6 @@
         public long TotalSize { get; set; }
         public DateTime EarliestTime { get; set; }
         public DateTime LatestTime { get; set; }
+        public bool Checked { get; set; } = true;
     }
 }

@@ -88,11 +88,14 @@ namespace DiscArchivingTool
                     if (Directory.EnumerateFileSystemEntries(path).Any())
                     {
                         if (await CommonDialog.ShowYesNoDialogAsync("清空目录",
-                            $"目录{path}不为空，{Environment.NewLine}导出前将清空目录。{Environment.NewLine}是否继续？"))
+                            $"目录{path}不为空，{Environment.NewLine}导出前将清空部分目录。{Environment.NewLine}是否继续？"))
                         {
                             try
                             {
-                                FzLib.IO.WindowsFileSystem.DeleteFileOrFolder(path, true, true);
+                                foreach (var index in fu.Packages.DiscFilePackages.Where(p=>p.Checked).Select(p=>p.Index))
+                                {
+                                    FzLib.IO.WindowsFileSystem.DeleteFileOrFolder(Path.Combine(path,index.ToString()), true, true);
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -158,7 +161,7 @@ namespace DiscArchivingTool
         private List<DiscFilePackage> discFilePackages;
 
         private int discSize = 4480;
-        private DateTime earliestDateTime = new DateTime(2000, 1, 1);
+        private DateTime earliestDateTime = new DateTime(1, 1, 1);
 
         private int maxDiscCount = 1000;
 

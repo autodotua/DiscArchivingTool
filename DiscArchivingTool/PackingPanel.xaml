@@ -150,25 +150,27 @@
                             <Setter.Value>
                                 <DataTemplate>
                                     <ui:SimpleStackPanel
-                                        Margin="0,8"
+                                        Margin="0,4,0,8"
                                         Spacing="4">
                                         <ui:SimpleStackPanel
                                             Orientation="Horizontal"
                                             Spacing="8">
-                                            <Ellipse
-                                                Width="6 "
-                                                Height="6"
-                                                Fill="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
-                                            <TextBlock
-                                                Width="36"
+                                            <CheckBox
+                                                Width="72"
+                                                Content="{Binding Index}"
+                                                FocusVisualStyle="{x:Null}"
                                                 FontWeight="Bold"
-                                                Text="{Binding Index}" />
-                                            <TextBlock Width="108">
+                                                IsChecked="{Binding Checked}" />
+                                            <TextBlock
+                                                Width="108"
+                                                VerticalAlignment="Center">
                                                 <Run>共</Run>
                                                 <Run Text="{Binding Files.Count, Mode=OneWay}" />
                                                 <Run>个文件</Run>
                                             </TextBlock>
-                                            <TextBlock Text="{Binding TotalSize, Converter={StaticResource FileLength2StringConverter}}" />
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Text="{Binding TotalSize, Converter={StaticResource FileLength2StringConverter}}" />
                                         </ui:SimpleStackPanel>
                                         <ui:SimpleStackPanel
                                             Orientation="Horizontal"

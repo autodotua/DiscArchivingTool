@@ -173,7 +173,7 @@ namespace DiscArchivingTool
             }
 
             stoppingExport = false;
-            foreach (var package in Packages.DiscFilePackages)
+            foreach (var package in Packages.DiscFilePackages.Where(p=>p.Checked))
             {
                 string dir = Path.Combine(distDir, package.Index.ToString());
                 Directory.CreateDirectory(dir);
