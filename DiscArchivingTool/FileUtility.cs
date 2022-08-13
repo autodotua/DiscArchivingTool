@@ -22,7 +22,7 @@ namespace DiscArchivingTool
         /// <returns></returns>
         public static string CopyAndGetHash(string from, string to)
         {
-            int bufferSize = 1024 * 1024;
+            int bufferSize = 1024 * 1024; //1MB的缓冲区
             using MD5 md5 = MD5.Create();
             using FileStream fileStream = new FileStream(to, FileMode.Create, FileAccess.Write, FileShare.None);
             using FileStream fs = new FileStream(from, FileMode.Open, FileAccess.Read);

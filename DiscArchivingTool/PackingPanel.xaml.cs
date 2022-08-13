@@ -169,6 +169,38 @@ namespace DiscArchivingTool
             btnStopExport.IsEnabled = false;
         }
 
+        private void BtnSelect_Click(object sender, RoutedEventArgs e)
+        {
+            if(ViewModel.DiscFilePackages==null)
+            {
+                return;
+            }
+            switch ((sender as Button).Tag as string)
+            {
+                case "1":
+                    foreach (var package in ViewModel.DiscFilePackages)
+                    {
+                        package.Checked = true;
+                    }
+                    break;
+                    case "2":
+                    foreach (var package in ViewModel.DiscFilePackages)
+                    {
+                        package.Checked = false;
+                    }
+                    break;
+                case "3":
+                    foreach (var package in ViewModel.DiscFilePackages)
+                    {
+                        package.Checked = false;
+                    }
+                    foreach (DiscFilePackage package in lvwPackages.SelectedItems)
+                    {
+                        package.Checked = true;
+                    }
+                    break;
+            }
+        }
     }
 
 

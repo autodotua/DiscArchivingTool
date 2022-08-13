@@ -139,15 +139,24 @@
                 <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <GridSplitter
+                Grid.RowSpan="99"
                 Grid.Column="1"
                 Width="8"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Stretch"
                 Background="Transparent" />
+
             <ListView
+                x:Name="lvwPackages"
                 ItemsSource="{Binding DiscFilePackages}"
-                SelectedItem="{Binding SelectedPackage}">
+                SelectedItem="{Binding SelectedPackage}"
+                SelectionMode="Extended">
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem
@@ -226,6 +235,7 @@
             </ListView>
 
             <ListView
+                Grid.RowSpan="99"
                 Grid.Column="2"
                 ItemsSource="{Binding SelectedPackage.Files}">
                 <ListView.View>
@@ -265,6 +275,37 @@
                     </GridView>
                 </ListView.View>
             </ListView>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Click="BtnSelect_Click"
+                    Content="全选"
+                    Tag="1" />
+                <Button
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    Click="BtnSelect_Click"
+                    Content="全不选"
+                    Tag="2" />
+                <Button
+                    Grid.Row="2"
+                    Grid.ColumnSpan="99"
+                    HorizontalAlignment="Stretch"
+                    Click="BtnSelect_Click"
+                    Content="勾选已选中的项"
+                    Tag="3" />
+            </Grid>
         </Grid>
         <Grid
             x:Name="grdBottom"
@@ -286,7 +327,8 @@
                 Width="360"
                 VerticalAlignment="Center"
                 Text="{Binding Message}"
-                TextTrimming="CharacterEllipsis" />
+                TextTrimming="CharacterEllipsis"
+                ToolTip="{Binding Message}" />
             <ProgressBar
                 Grid.Column="2"
                 VerticalAlignment="Center"
