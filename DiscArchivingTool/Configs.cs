@@ -28,6 +28,7 @@ namespace DiscArchivingTool
     {
         public string InputDir { get; set; }
         public string OutputDir { get; set; }
+        public bool OverrideWhenExisted { get; set; }
     }
     public class CheckConfigs
     {

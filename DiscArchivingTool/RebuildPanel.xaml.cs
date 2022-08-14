@@ -85,19 +85,16 @@ namespace DiscArchivingTool
         {
             try
             {
+                ViewModel.RebuildErrors.Clear();
                 stkConfig.IsEnabled = false;
                 btnRebuild.IsEnabled = false;
-                IReadOnlyList<RebuildUtility.RebuildError> errors = null;
+                IReadOnlyList<RebuildError> errors = null;
                 await Task.Run(() =>
                   {
-                      errors = ru.Rebuild(ViewModel.OutputDir);
+                      ViewModel.RebuildErrors = ru.Rebuild(ViewModel.OutputDir,ViewModel.OverrideWhenExisted);
                   });
 
-                if (errors.Count > 0)
-                {
-                    await CommonDialog.ShowErrorDialogAsync("重建完成，但是部分文件重建失败：", string.Join(Environment.NewLine, errors.Select(p => $"{p.File.Path}：{p.Error}")));
-                }
-                else
+                if (ViewModel.RebuildErrors.Count == 0)
                 {
                     await CommonDialog.ShowOkDialogAsync("重建成功");
                 }
@@ -184,6 +181,18 @@ namespace DiscArchivingTool
         {
             get => progressMax;
             set => this.SetValueAndNotify(ref progressMax, value, nameof(ProgressMax));
+        }
+        private bool overrideWhenExisted;
+        public bool OverrideWhenExisted
+        {
+            get => overrideWhenExisted;
+            set => this.SetValueAndNotify(ref overrideWhenExisted, value, nameof(OverrideWhenExisted));
+        }
+        private List<RebuildError> rebuildErrors = new List<RebuildError>();
+        public List<RebuildError> RebuildErrors
+        {
+            get => rebuildErrors;
+            set => this.SetValueAndNotify(ref rebuildErrors, value, nameof(RebuildErrors));
         }
 
     }

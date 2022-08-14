@@ -76,62 +76,97 @@
                     Content="解析" />
             </Grid>
         </ui:SimpleStackPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <GridSplitter
+                Grid.Column="1"
+                Width="8"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Stretch"
+                Background="Transparent" />
+            <GroupBox Header="  目录结构树">
 
-        <TreeView
-            x:Name="tree"
-            Grid.Row="2"
-            ItemsSource="{Binding FileTree}">
-            <TreeView.Resources>
-                <HierarchicalDataTemplate
-                    DataType="{x:Type local:FreeFileSystemTree}"
-                    ItemsSource="{Binding All}">
-                    <TreeViewItem
-                        HorizontalAlignment="Stretch"
-                        Header="{Binding .}"
-                        PreviewMouseDoubleClick="TreeViewItem_PreviewMouseDoubleClick">
-                        <TreeViewItem.HeaderTemplate>
-                            <DataTemplate DataType="{x:Type local:FreeFileSystemTree}">
-                                <ContentControl x:Name="cc">
-                                    <TextBlock
-                                        FontWeight="Bold"
-                                        Text="{Binding Name}" />
-                                </ContentControl>
-                                <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding IsFile}">
-                                        <DataTrigger.Value>
-                                            <sys:Boolean>True</sys:Boolean>
-                                        </DataTrigger.Value>
-                                        <DataTrigger.Setters>
-                                            <Setter TargetName="cc" Property="Content">
-                                                <Setter.Value>
-                                                    <ui:SimpleStackPanel
-                                                        Orientation="Horizontal"
-                                                        Spacing="16">
-                                                        <TextBlock
-                                                            Width="240"
-                                                            Text="{Binding Name}"
-                                                            TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock
-                                                            Width="80"
-                                                            Text="{Binding File.Length, Converter={StaticResource FileLength2StringConverter}}"
-                                                            TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock
-                                                            Width="160"
-                                                            Text="{Binding File.LastWriteTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}"
-                                                            TextTrimming="CharacterEllipsis" />
-                                                    </ui:SimpleStackPanel>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </DataTrigger.Setters>
-                                    </DataTrigger>
-                                </DataTemplate.Triggers>
-                            </DataTemplate>
+                <TreeView
+                    x:Name="tree"
+                    ItemsSource="{Binding FileTree}">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate
+                            DataType="{x:Type local:FreeFileSystemTree}"
+                            ItemsSource="{Binding All}">
+                            <TreeViewItem
+                                HorizontalAlignment="Stretch"
+                                Header="{Binding .}"
+                                PreviewMouseDoubleClick="TreeViewItem_PreviewMouseDoubleClick">
+                                <TreeViewItem.HeaderTemplate>
+                                    <DataTemplate DataType="{x:Type local:FreeFileSystemTree}">
+                                        <ContentControl x:Name="cc">
+                                            <TextBlock
+                                                FontWeight="Bold"
+                                                Text="{Binding Name}" />
+                                        </ContentControl>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsFile}">
+                                                <DataTrigger.Value>
+                                                    <sys:Boolean>True</sys:Boolean>
+                                                </DataTrigger.Value>
+                                                <DataTrigger.Setters>
+                                                    <Setter TargetName="cc" Property="Content">
+                                                        <Setter.Value>
+                                                            <ui:SimpleStackPanel
+                                                                Orientation="Horizontal"
+                                                                Spacing="16">
+                                                                <TextBlock
+                                                                    Width="240"
+                                                                    Text="{Binding Name}"
+                                                                    TextTrimming="CharacterEllipsis" />
+                                                                <TextBlock
+                                                                    Width="80"
+                                                                    Text="{Binding File.Length, Converter={StaticResource FileLength2StringConverter}}"
+                                                                    TextTrimming="CharacterEllipsis" />
+                                                                <TextBlock
+                                                                    Width="160"
+                                                                    Text="{Binding File.LastWriteTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}"
+                                                                    TextTrimming="CharacterEllipsis" />
+                                                            </ui:SimpleStackPanel>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger.Setters>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
 
-                        </TreeViewItem.HeaderTemplate>
-                    </TreeViewItem>
-                </HierarchicalDataTemplate>
-            </TreeView.Resources>
-        </TreeView>
+                                </TreeViewItem.HeaderTemplate>
+                            </TreeViewItem>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+            </GroupBox>
+
+            <GroupBox
+                Grid.Column="2"
+                Header="  重建错误">
+                <ListView ItemsSource="{Binding RebuildErrors}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn
+                                DisplayMemberBinding="{Binding File.DiscName}"
+                                Header="光盘文件" />
+                            <GridViewColumn
+                                DisplayMemberBinding="{Binding File.Path}"
+                                Header="目标目录" />
+                            <GridViewColumn
+                                DisplayMemberBinding="{Binding Error}"
+                                Header="错误信息" />
+
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+        </Grid>
         <Grid
             Grid.Row="99"
             Margin="8">
@@ -139,6 +174,8 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
@@ -152,6 +189,11 @@
                 VerticalAlignment="Center"
                 Maximum="{Binding ProgressMax}"
                 Value="{Binding Progress}" />
+            <CheckBox
+                Grid.Column="4"
+                VerticalAlignment="Center"
+                Content="文件已存在时覆盖"
+                IsChecked="{Binding OverrideWhenExisted}" />
             <Button
                 x:Name="btnRebuild"
                 Grid.Column="99"

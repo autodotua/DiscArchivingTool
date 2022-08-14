@@ -60,7 +60,7 @@ namespace DiscArchivingTool
         /// </summary>
         /// <param name="distDir"></param>
         /// <returns></returns>
-        public IReadOnlyList<RebuildError> Rebuild(string distDir)
+        public List<RebuildError> Rebuild(string distDir, bool overrideWhenExisted)
         {
             List<RebuildError> errorFiles = new List<RebuildError>();
             double length = 0;
@@ -76,11 +76,22 @@ namespace DiscArchivingTool
                         var distFileDir = Path.GetDirectoryName(distPath);
                         var name = Path.GetFileName(file.Path);
                         MessageReceived?.Invoke(this, new MessageEventArgs($"正在重建 {file.Path}"));
-                        Directory.CreateDirectory(distFileDir);
+                        if (!Directory.Exists(distFileDir))
+                        {
+                            Directory.CreateDirectory(distFileDir);
+                        }
+                        if (File.Exists(distPath) && !overrideWhenExisted)
+                        {
+                            throw new Exception("文件已存在");
+                        }
                         string md5 = FileUtility.CopyAndGetHash(srcPath, distPath);
                         if (md5 != file.Md5)
                         {
-                            errorFiles.Add(new RebuildError(file, "文件验证失败"));
+                            throw new Exception("MD5验证失败");
+                        }
+                        if(File.GetLastWriteTime(srcPath)!=file.LastWriteTime)
+                        {
+                            throw new Exception("修改时间不一致");
                         }
                     }
                     catch (Exception ex)
@@ -92,16 +103,18 @@ namespace DiscArchivingTool
             }
             return errorFiles;
         }
-        public class RebuildError
+    }
+    public class RebuildError
+    {
+        public RebuildError(DiscFile file, string error)
         {
-            public RebuildError(DiscFile file, string error)
-            {
-                File = file;
-                Error = error;
-            }
-
-            public string Error { get; set; }
-            public DiscFile File { get; set; }
+            File = file;
+            Error = error;
         }
+
+        public string Error { get; set; }
+        public DiscFile File { get; set; }
     }
 }
+
+
