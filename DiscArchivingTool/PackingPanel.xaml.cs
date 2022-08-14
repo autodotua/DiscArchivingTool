@@ -151,6 +151,11 @@ namespace DiscArchivingTool
                     {
                         ViewModel.Message = "终止";
                     }
+                    catch (Exception ex)
+                    {
+                        await CommonDialog.ShowErrorDialogAsync(ex, "打包失败");
+                        ViewModel.Message = "终止";
+                    }
                 }
             }
 
@@ -171,7 +176,7 @@ namespace DiscArchivingTool
 
         private void BtnSelect_Click(object sender, RoutedEventArgs e)
         {
-            if(ViewModel.DiscFilePackages==null)
+            if (ViewModel.DiscFilePackages == null)
             {
                 return;
             }
@@ -183,7 +188,7 @@ namespace DiscArchivingTool
                         package.Checked = true;
                     }
                     break;
-                    case "2":
+                case "2":
                     foreach (var package in ViewModel.DiscFilePackages)
                     {
                         package.Checked = false;

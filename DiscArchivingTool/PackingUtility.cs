@@ -3,6 +3,7 @@ using DiscUtils.Iso9660;
 using FzLib.IO;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -172,83 +173,95 @@ namespace DiscArchivingTool
                 Directory.CreateDirectory(distDir);
             }
             double length = 0;
-            double totalLength = Packages.DiscFilePackages.Sum(p => p.Files.Sum(q => q.Length));
+            double totalLength = Packages.DiscFilePackages
+                .Where(p => p.Checked && p.Index > 0)
+                .Sum(p => p.Files.Sum(q => q.Length));
             stoppingExport = false;
-            foreach (var package in Packages.DiscFilePackages.Where(p => p.Checked))
+            foreach (var package in Packages.DiscFilePackages.Where(p => p.Checked && p.Index > 0))
             {
                 string dir = Path.Combine(distDir, package.Index.ToString());
                 Directory.CreateDirectory(dir);
-                using var fileListStream = File.OpenWrite(Path.Combine(dir, $"filelist-{DateTime.Now:yyyyMMddHHmmss}.txt"));
-                using var writer = new StreamWriter(fileListStream);
-
-                writer.WriteLine($"{package.EarliestTime.ToString(DateTimeFormat)}\t{package.LatestTime.ToString(DateTimeFormat)}\t{package.TotalSize}");
-
-                foreach (var file in package.Files)
+                string fileListName = $"filelist-{DateTime.Now:yyyyMMddHHmmss}.txt";
+                CDBuilder builder = null;
+                if (createISO)
                 {
-                    bool retry = false;
-                    bool abort = false;
-                    do
-                    {
-                        string relativePath = "";
-                        try
-                        {
-                            relativePath = Path.GetRelativePath(sourceDir, file.Path);
-                            string newName = relativePath.Replace(":", "#c#").Replace("\\", "#s#");
-                            MessageReceived?.Invoke(this, new MessageEventArgs($"正在复制第 {package.Index} 个光盘文件包中的 {relativePath}"));
-                            string md5 = FileUtility.CopyAndGetHash(file.Path, Path.Combine(dir, newName));
-
-                            writer.WriteLine($"{newName}\t{relativePath}\t{file.LastWriteTime.ToString(DateTimeFormat)}\t{file.Length}\t{md5}");
-                        }
-                        catch (Exception ex)
-                        {
-                            var op = await error($"文件{relativePath}导出失败：{ex.Message}");
-                            switch (op)
-                            {
-                                case ErrorOperation.Retry:
-                                    retry = true;
-                                    break;
-                                case ErrorOperation.Abort:
-                                    retry = false;
-                                    abort = true;
-                                    break;
-                                default:
-                                    retry = false;
-                                    break;
-                            }
-                        }
-                    } while (retry);
-                    if (abort || stoppingExport)
-                    {
-                        throw new OperationCanceledException();
-                    }
-
-                    RebuildProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs(length += file.Length, totalLength));
+                    builder = new CDBuilder();
+                    builder.UseJoliet = true;
                 }
+                using (var fileListStream = File.OpenWrite(Path.Combine(dir, fileListName)))
+                using (var writer = new StreamWriter(fileListStream))
+                {
 
+                    writer.WriteLine($"{package.EarliestTime.ToString(DateTimeFormat)}\t{package.LatestTime.ToString(DateTimeFormat)}\t{package.TotalSize}");
+
+
+                    foreach (var file in package.Files)
+                    {
+                        bool retry = false;
+                        bool abort = false;
+                        do
+                        {
+                            string relativePath = "";
+                            try
+                            {
+                                relativePath = Path.GetRelativePath(sourceDir, file.Path);
+                                string newName = relativePath.Replace(":", "#c#").Replace("\\", "#s#");
+                                string md5 = null;
+                                if (createISO)
+                                {
+                                    MessageReceived?.Invoke(this, new MessageEventArgs($"正在处理第 {package.Index} 个光盘文件包中的 {relativePath}"));
+                                    builder.AddFile(newName, file.Path);
+                                    md5 = FileUtility.GetMD5(file.Path);
+                                }
+                                else
+                                {
+                                    MessageReceived?.Invoke(this, new MessageEventArgs($"正在复制第 {package.Index} 个光盘文件包中的 {relativePath}"));
+                                    md5 = FileUtility.CopyAndGetHash(file.Path, Path.Combine(dir, newName));
+                                }
+
+                                writer.WriteLine($"{newName}\t{relativePath}\t{file.LastWriteTime.ToString(DateTimeFormat)}\t{file.Length}\t{md5}");
+                            }
+                            catch (Exception ex)
+                            {
+                                var op = await error($"文件{relativePath}导出失败：{ex.Message}");
+                                switch (op)
+                                {
+                                    case ErrorOperation.Retry:
+                                        retry = true;
+                                        break;
+                                    case ErrorOperation.Abort:
+                                        retry = false;
+                                        abort = true;
+                                        break;
+                                    default:
+                                        retry = false;
+                                        break;
+                                }
+                            }
+                        } while (retry);
+                        if (abort || stoppingExport)
+                        {
+                            throw new OperationCanceledException();
+                        }
+
+                        RebuildProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs(length += file.Length, totalLength));
+                    }
+                }
                 if (createISO)
                 {
                     MessageReceived?.Invoke(this, new MessageEventArgs($"正在创第 {package.Index} 个ISO"));
-                    CreateISO(dir);
+                    builder.AddFile(fileListName, Path.Combine(dir, fileListName));
+                    builder.Build(Path.Combine(Path.GetDirectoryName(dir), Path.GetFileName(dir) + ".iso"));
+
                 }
             }
-        }
-        /// <summary>
-        /// 创建ISO
-        /// </summary>
-        /// <param name="dir"></param>
-        private void CreateISO(string dir)
-        {
-            CDBuilder builder = new CDBuilder();
-            builder.UseJoliet = true;
-            foreach (var file in Directory.EnumerateFiles(dir))
-            {
-                builder.AddFile(Path.GetFileName(file), file);
-            }
-            builder.Build(Path.Combine(Path.GetDirectoryName(dir), Path.GetFileName(dir) + ".iso"));
         }
 
         public event EventHandler<MessageEventArgs> MessageReceived;
         public event EventHandler<ProgressUpdatedEventArgs> RebuildProgressUpdated;
 
     }
+
 }
+
+
