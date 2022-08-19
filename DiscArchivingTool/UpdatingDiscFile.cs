@@ -2,18 +2,6 @@
 
 namespace DiscArchivingTool
 {
-    public class UpdatingDiscFile
-    {
-        public bool Checked { get; set; }
-        public DiscFile File { get; set; }
-        public FileInfo SourceFile { get; set; }
-        public UpdatingType Type { get; set; }
-        public bool NameChanged => Type.HasFlag(UpdatingType.NameChanged);
-        public bool PathChanged => Type.HasFlag(UpdatingType.PathChanged);
-        public bool LengthChanged => Type.HasFlag(UpdatingType.LengthChanged);
-        public bool TimeChanged => Type.HasFlag(UpdatingType.TimeChanged);
-        public bool Deleted => Type.HasFlag(UpdatingType.Deleted);
-    }
     [Flags]
     public enum UpdatingType
     {
@@ -25,4 +13,16 @@ namespace DiscArchivingTool
         Deleted = 0x10,
     }
 
+    public class UpdatingDiscFile
+    {
+        public bool Checked { get; set; }
+        public bool Deleted => Type.HasFlag(UpdatingType.Deleted);
+        public DiscFile DiscFile { get; set; }
+        public bool LengthChanged => Type.HasFlag(UpdatingType.LengthChanged);
+        public bool NameChanged => Type.HasFlag(UpdatingType.NameChanged);
+        public bool PathChanged => Type.HasFlag(UpdatingType.PathChanged);
+        public DiscFile ReferenceFile { get; set; }
+        public bool TimeChanged => Type.HasFlag(UpdatingType.TimeChanged);
+        public UpdatingType Type { get; set; }
+    }
 }

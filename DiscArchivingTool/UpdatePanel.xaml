@@ -51,7 +51,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     VerticalAlignment="Center"
-                    Text="源目录：" />
+                    Text="参照目录：" />
                 <TextBox
                     Grid.Column="2"
                     Text="{Binding SourceDir}" />
@@ -128,126 +128,214 @@
         <GroupBox
             Grid.Row="2"
             Header="  需要更新的文件">
-            <ListView ItemsSource="{Binding UpdatingDiscFiles}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn
-                            DisplayMemberBinding="{Binding File.DiscName}"
-                            Header="光盘文件名" />
-                        <GridViewColumn
-                            DisplayMemberBinding="{Binding SourceFile.Name}"
-                            Header="源文件名" />
-                        <GridViewColumn Header="已删除">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                        x:Name="e"
-                                        Foreground="Green"
-                                        Text="●"
-                                        Visibility="Collapsed" />
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding Deleted}">
-                                            <DataTrigger.Value>
-                                                <sys:Boolean>True</sys:Boolean>
-                                            </DataTrigger.Value>
-                                            <DataTrigger.Setters>
-                                                <Setter TargetName="e" Property="Visibility" Value="Visible" />
-                                            </DataTrigger.Setters>
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="文件名已更新">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                        x:Name="e"
-                                        Foreground="Green"
-                                        Text="●"
-                                        Visibility="Collapsed" />
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding NameChanged}">
-                                            <DataTrigger.Value>
-                                                <sys:Boolean>True</sys:Boolean>
-                                            </DataTrigger.Value>
-                                            <DataTrigger.Setters>
-                                                <Setter TargetName="e" Property="Visibility" Value="Visible" />
-                                            </DataTrigger.Setters>
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="路径已更新">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                        x:Name="e"
-                                        Foreground="Green"
-                                        Text="●"
-                                        Visibility="Collapsed" />
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding PathChanged}">
-                                            <DataTrigger.Value>
-                                                <sys:Boolean>True</sys:Boolean>
-                                            </DataTrigger.Value>
-                                            <DataTrigger.Setters>
-                                                <Setter TargetName="e" Property="Visibility" Value="Visible" />
-                                            </DataTrigger.Setters>
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="大小不匹配">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                        x:Name="e"
-                                        Foreground="Red"
-                                        Text="●"
-                                        Visibility="Collapsed" />
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding LengthChanged}">
-                                            <DataTrigger.Value>
-                                                <sys:Boolean>True</sys:Boolean>
-                                            </DataTrigger.Value>
-                                            <DataTrigger.Setters>
-                                                <Setter TargetName="e" Property="Visibility" Value="Visible" />
-                                            </DataTrigger.Setters>
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
+            <DataGrid
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                CanUserReorderColumns="False"
+                GridLinesVisibility="None"
+                ItemsSource="{Binding UpdatingDiscFiles}"
+                SelectionUnit="FullRow">
+                <DataGrid.Resources>
+                    <Style
+                        x:Key="{x:Type DataGridCell}"
+                        TargetType="{x:Type DataGridCell}">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderBrush" Value="{x:Null}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.RowDetailsTemplate>
+                    <DataTemplate>
+                        <Grid Margin="16,8">
+                            <Grid.Resources>
+                                <Style
+                                    BasedOn="{StaticResource DefaultTextBoxStyle}"
+                                    TargetType="{x:Type TextBox}">
+                                    <Setter Property="IsReadOnly" Value="True" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Header="光盘文件">
+                                <ui:SimpleStackPanel Spacing="8">
 
-                        <GridViewColumn Header="修改日期不匹配">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                        x:Name="e"
-                                        Foreground="Red"
-                                        Text="●"
-                                        Visibility="Collapsed" />
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding TimeChanged}">
-                                            <DataTrigger.Value>
-                                                <sys:Boolean>True</sys:Boolean>
-                                            </DataTrigger.Value>
-                                            <DataTrigger.Setters>
-                                                <Setter TargetName="e" Property="Visibility" Value="Visible" />
-                                            </DataTrigger.Setters>
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
+                                    <TextBox
+                                        ui:ControlHelper.Header="文件名"
+                                        Text="{Binding DiscFile.DiscName, Mode=OneWay}" />
+                                    <TextBox
+                                        ui:ControlHelper.Header="文件长度"
+                                        Text="{Binding DiscFile.Length, Mode=OneWay}" />
+                                    <TextBox
+                                        ui:ControlHelper.Header="修改日期"
+                                        Text="{Binding DiscFile.LastWriteTime, Mode=OneWay, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
+                                    <TextBox
+                                        ui:ControlHelper.Header="MD5"
+                                        Text="{Binding DiscFile.Md5, Mode=OneWay}" />
+                                </ui:SimpleStackPanel>
+                            </GroupBox>
+                            <GroupBox
+                                Grid.Column="2"
+                                Header="参照文件"
+                                Visibility="{Binding ReferenceFile, Converter={StaticResource NotNullConverter}}">
+                                <ui:SimpleStackPanel Spacing="8">
+                                    <TextBox
+                                        ui:ControlHelper.Header="文件名"
+                                        Text="{Binding ReferenceFile.RawName, Mode=OneWay}" />
+                                    <TextBox
+                                        ui:ControlHelper.Header="文件长度"
+                                        Text="{Binding ReferenceFile.Length, Mode=OneWay}" />
+                                    <TextBox
+                                        ui:ControlHelper.Header="修改日期"
+                                        Text="{Binding ReferenceFile.LastWriteTime, Mode=OneWay, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
+                                    <TextBox
+                                        ui:ControlHelper.Header="相对路径"
+                                        Text="{Binding ReferenceFile.Path, Mode=OneWay}" />
+                                </ui:SimpleStackPanel>
+                            </GroupBox>
+                        </Grid>
+                    </DataTemplate>
+                </DataGrid.RowDetailsTemplate>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        Binding="{Binding Checked}"
+                        Header="需要更新" />
+                    <DataGridTextColumn
+                        Binding="{Binding DiscFile.DiscName}"
+                        Header="光盘文件名"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        Binding="{Binding ReferenceFile.Name}"
+                        Header="源文件名"
+                        IsReadOnly="True" />
+                    <DataGridTemplateColumn Header="已删除">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    x:Name="e"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="Green"
+                                    Text="●"
+                                    Visibility="Collapsed" />
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Deleted}">
+                                        <DataTrigger.Value>
+                                            <sys:Boolean>True</sys:Boolean>
+                                        </DataTrigger.Value>
+                                        <DataTrigger.Setters>
+                                            <Setter TargetName="e" Property="Visibility" Value="Visible" />
+                                        </DataTrigger.Setters>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="文件名已更新">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    x:Name="e"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="Green"
+                                    Text="●"
+                                    Visibility="Collapsed" />
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding NameChanged}">
+                                        <DataTrigger.Value>
+                                            <sys:Boolean>True</sys:Boolean>
+                                        </DataTrigger.Value>
+                                        <DataTrigger.Setters>
+                                            <Setter TargetName="e" Property="Visibility" Value="Visible" />
+                                        </DataTrigger.Setters>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="路径已更新">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    x:Name="e"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="Green"
+                                    Text="●"
+                                    Visibility="Collapsed" />
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding PathChanged}">
+                                        <DataTrigger.Value>
+                                            <sys:Boolean>True</sys:Boolean>
+                                        </DataTrigger.Value>
+                                        <DataTrigger.Setters>
+                                            <Setter TargetName="e" Property="Visibility" Value="Visible" />
+                                        </DataTrigger.Setters>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="大小不匹配">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    x:Name="e"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="Red"
+                                    Text="●"
+                                    Visibility="Collapsed" />
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding LengthChanged}">
+                                        <DataTrigger.Value>
+                                            <sys:Boolean>True</sys:Boolean>
+                                        </DataTrigger.Value>
+                                        <DataTrigger.Setters>
+                                            <Setter TargetName="e" Property="Visibility" Value="Visible" />
+                                        </DataTrigger.Setters>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="修改日期不匹配">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    x:Name="e"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="Red"
+                                    Text="●"
+                                    Visibility="Collapsed" />
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding TimeChanged}">
+                                        <DataTrigger.Value>
+                                            <sys:Boolean>True</sys:Boolean>
+                                        </DataTrigger.Value>
+                                        <DataTrigger.Setters>
+                                            <Setter TargetName="e" Property="Visibility" Value="Visible" />
+                                        </DataTrigger.Setters>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
 
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                </DataGrid.Columns>
+            </DataGrid>
         </GroupBox>
 
         <Grid

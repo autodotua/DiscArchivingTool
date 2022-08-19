@@ -93,16 +93,11 @@ namespace DiscArchivingTool
         private bool byLength;
         private bool byName;
         private bool byTime;
-        private List<UpdatingDiscFile> updatingDiscFiles;
         private string inputDir;
-
         private string message = "就绪";
-
-
         private string outputDir;
-
         private string sourceDir;
-
+        private List<UpdatingDiscFile> updatingDiscFiles;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public bool ByLength
@@ -123,17 +118,12 @@ namespace DiscArchivingTool
             set => this.SetValueAndNotify(ref byTime, value, nameof(ByTime));
         }
 
-        public List<UpdatingDiscFile> UpdatingDiscFiles
-        {
-            get => updatingDiscFiles;
-            set => this.SetValueAndNotify(ref updatingDiscFiles, value, nameof(UpdatingDiscFiles));
-        }
-
         public string InputDir
         {
             get => inputDir;
             set => this.SetValueAndNotify(ref inputDir, value, nameof(InputDir));
         }
+
         public string Message
         {
             get => message;
@@ -146,11 +136,16 @@ namespace DiscArchivingTool
             set => this.SetValueAndNotify(ref outputDir, value, nameof(OutputDir));
         }
 
-
         public string SourceDir
         {
             get => sourceDir;
             set => this.SetValueAndNotify(ref sourceDir, value, nameof(SourceDir));
+        }
+
+        public List<UpdatingDiscFile> UpdatingDiscFiles
+        {
+            get => updatingDiscFiles;
+            set => this.SetValueAndNotify(ref updatingDiscFiles, value, nameof(UpdatingDiscFiles));
         }
     }
 

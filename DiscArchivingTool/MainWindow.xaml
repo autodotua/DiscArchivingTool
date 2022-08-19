@@ -6,11 +6,12 @@
     xmlns:local="clr-namespace:DiscArchivingTool"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="MainWindow"
+    Title="光盘归档工具"
     Width="1200"
-    Height="800" Closing="Window_Closing"
+    Height="800"
     ui:TitleBar.ExtendViewIntoTitleBar="True"
     ui:WindowHelper.UseModernWindowStyle="True"
+    Closing="Window_Closing"
     WindowState="Maximized"
     mc:Ignorable="d">
     <Grid>
@@ -35,7 +36,7 @@
                 <TextBlock
                     VerticalAlignment="Center"
                     FontSize="13"
-                    Text="光盘存档工具" />
+                    Text="光盘归档工具" />
                 <ui:TitleBarButton
                     x:Name="btnTitleBarMore"
                     Grid.Column="2"
@@ -67,10 +68,10 @@
                 <local:RebuildPanel x:Name="rebuild" />
             </TabItem>
             <TabItem Header="校验">
-                <local:CheckPanel x:Name="checkout"/>
+                <local:CheckPanel x:Name="checkout" />
             </TabItem>
             <TabItem Header="更新">
-                <local:UpdatePanel x:Name="update"/>
+                <local:UpdatePanel x:Name="update" />
             </TabItem>
         </TabControl>
     </Grid>
