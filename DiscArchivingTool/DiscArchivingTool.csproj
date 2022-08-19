@@ -34,6 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="UpdatePanel.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="CheckPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -43,6 +46,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UpdatePanel.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="CheckPanel.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

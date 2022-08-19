@@ -70,7 +70,7 @@
                 <local:CheckPanel x:Name="checkout"/>
             </TabItem>
             <TabItem Header="更新">
-                在文件的目录结构发生修改之后，重新建立filelist
+                <local:UpdatePanel x:Name="update"/>
             </TabItem>
         </TabControl>
     </Grid>

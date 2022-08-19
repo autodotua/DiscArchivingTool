@@ -61,16 +61,8 @@
                     Content="浏览" />
             </Grid>
             <Grid HorizontalAlignment="Right">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
                 <Button
                     x:Name="btnAnalyze"
-                    Grid.Column="2"
                     Padding="32,4"
                     Click="BtnAnalyze_Click"
                     Content="解析" />

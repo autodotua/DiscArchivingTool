@@ -41,6 +41,7 @@ namespace DiscArchivingTool
             config.Packing.Adapt(packing.ViewModel);
             config.Rebuild.Adapt(rebuild.ViewModel);
             config.Check.Adapt(checkout.ViewModel);
+            config.Update.Adapt(update.ViewModel);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -48,6 +49,7 @@ namespace DiscArchivingTool
             packing.ViewModel.Adapt(config.Packing);
             rebuild.ViewModel.Adapt(config.Rebuild);
             checkout.ViewModel.Adapt(config.Check);
+            update.ViewModel.Adapt(config.Update);
             config.Save(configPath);
         }
     }
