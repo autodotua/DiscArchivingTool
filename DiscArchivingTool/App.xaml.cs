@@ -17,7 +17,7 @@ namespace DiscArchivingTool
         /// <summary>
         /// 统一的日期时间格式
         /// </summary>
-        public const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        public const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
         private void Application_Startup(object sender, StartupEventArgs e)
         {
         #if (DEBUG)

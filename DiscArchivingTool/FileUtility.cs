@@ -101,7 +101,7 @@ namespace DiscArchivingTool
                         {
                             DiscName = parts[0],
                             Path = parts[1],
-                            LastWriteTime = DateTime.ParseExact(parts[2], DateTimeFormat, CultureInfo.InvariantCulture),
+                            LastWriteTime = DateTime.Parse(parts[2]),
                             Length = long.Parse(parts[3]),
                             Md5 = parts[4],
                             RawName = Path.GetFileName(parts[1]),

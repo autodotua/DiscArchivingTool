@@ -61,16 +61,16 @@
         </Border>
 
         <TabControl Grid.Row="2">
-            <TabItem Header="打包">
+            <TabItem Header=" 打包 ">
                 <local:PackingPanel x:Name="packing" />
             </TabItem>
-            <TabItem Header="重建">
+            <TabItem Header=" 重建 ">
                 <local:RebuildPanel x:Name="rebuild" />
             </TabItem>
-            <TabItem Header="校验">
+            <TabItem Header=" 校验 ">
                 <local:CheckPanel x:Name="checkout" />
             </TabItem>
-            <TabItem Header="更新">
+            <TabItem Header=" 更新 ">
                 <local:UpdatePanel x:Name="update" />
             </TabItem>
         </TabControl>

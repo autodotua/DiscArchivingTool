@@ -129,7 +129,7 @@ namespace DiscArchivingTool
             set => this.SetValueAndNotify(ref checkResults, value, nameof(CheckResults),nameof(ErrorOnlyCheckResults));
         }
 
-        public List<CheckResult> ErrorOnlyCheckResults => CheckResults.Where(p => p.NoProblem == false).ToList();
+        public List<CheckResult> ErrorOnlyCheckResults => CheckResults?.Where(p => p.NoProblem == false)?.ToList();
     }
 
 }

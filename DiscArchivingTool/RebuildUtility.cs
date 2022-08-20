@@ -60,11 +60,12 @@ namespace DiscArchivingTool
         /// </summary>
         /// <param name="distDir"></param>
         /// <returns></returns>
-        public List<RebuildError> Rebuild(string distDir, bool overrideWhenExisted)
+        public int Rebuild(string distDir, bool overrideWhenExisted, out List<RebuildError> errorFiles)
         {
-            List<RebuildError> errorFiles = new List<RebuildError>();
+            errorFiles = new List<RebuildError>();
             double length = 0;
             double totalLength = files.Values.Sum(p => p.Sum(q => q.Length));
+            int count = 0;
             foreach (var dir in files.Keys)
             {
                 foreach (var file in files[dir])
@@ -89,10 +90,11 @@ namespace DiscArchivingTool
                         {
                             throw new Exception("MD5验证失败");
                         }
-                        if(File.GetLastWriteTime(srcPath)!=file.LastWriteTime)
+                        if ((File.GetLastWriteTime(srcPath) - file.LastWriteTime).Duration().TotalSeconds > Configs.MaxTimeTolerance)
                         {
                             throw new Exception("修改时间不一致");
                         }
+                        count++;
                     }
                     catch (Exception ex)
                     {
@@ -101,7 +103,7 @@ namespace DiscArchivingTool
                     RebuildProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs(length += file.Length, totalLength));
                 }
             }
-            return errorFiles;
+            return count;
         }
     }
     public class RebuildError

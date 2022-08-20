@@ -88,15 +88,16 @@ namespace DiscArchivingTool
                 ViewModel.RebuildErrors.Clear();
                 stkConfig.IsEnabled = false;
                 btnRebuild.IsEnabled = false;
-                IReadOnlyList<RebuildError> errors = null;
+                int count = 0;
                 await Task.Run(() =>
                   {
-                      ViewModel.RebuildErrors = ru.Rebuild(ViewModel.OutputDir,ViewModel.OverrideWhenExisted);
+                      count = ru.Rebuild(ViewModel.OutputDir,ViewModel.OverrideWhenExisted,out List<RebuildError> rebuildErrors);
+                      ViewModel.RebuildErrors = rebuildErrors;
                   });
 
                 if (ViewModel.RebuildErrors.Count == 0)
                 {
-                    await CommonDialog.ShowOkDialogAsync("重建成功");
+                    await CommonDialog.ShowOkDialogAsync("重建成功",$"共{count}个文件");
                 }
             }
             finally

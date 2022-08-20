@@ -11,6 +11,7 @@ namespace DiscArchivingTool
 {
     public class Configs : IJsonSerializable
     {
+        public static readonly double MaxTimeTolerance = 1;
         public void Save(string path)
         {
             string dir = Path.GetDirectoryName(path);

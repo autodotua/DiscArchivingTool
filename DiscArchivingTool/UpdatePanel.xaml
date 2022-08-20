@@ -213,8 +213,8 @@
                         Header="光盘文件名"
                         IsReadOnly="True" />
                     <DataGridTextColumn
-                        Binding="{Binding ReferenceFile.Name}"
-                        Header="源文件名"
+                        Binding="{Binding ReferenceFile.Path}"
+                        Header="参考文件路径"
                         IsReadOnly="True" />
                     <DataGridTemplateColumn Header="已删除">
                         <DataGridTemplateColumn.CellTemplate>

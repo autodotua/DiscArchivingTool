@@ -36,7 +36,7 @@ namespace DiscArchivingTool
                         }
                         else
                         {
-                            if (file.LastWriteTime != discFile.LastWriteTime)
+                            if ((file.LastWriteTime-discFile.LastWriteTime).Duration().TotalSeconds>Configs.MaxTimeTolerance)
                             {
                                 result.ErrorTime = true;
                             }

@@ -74,6 +74,10 @@ namespace DiscArchivingTool
                     btnUpdate.IsEnabled = true;
                 }
             }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex, "查找失败");
+            }
             finally
             {
                 stkConfig.IsEnabled = true;
@@ -81,9 +85,27 @@ namespace DiscArchivingTool
             }
         }
 
-        private void BtnUpdate_Click(object sender, RoutedEventArgs e)
+        private async void BtnUpdate_Click(object sender, RoutedEventArgs e)
         {
-
+            try
+            {
+                stkConfig.IsEnabled = btnUpdate.IsEnabled = false;
+                ViewModel.Message = "正在更新";
+                await Task.Run(() =>
+                {
+                    uu.Update(ViewModel.OutputDir);
+                });
+                btnUpdate.IsEnabled = false;
+            }
+            catch (Exception ex)
+            {
+                await CommonDialog.ShowErrorDialogAsync(ex, "更新失败");
+            }
+            finally
+            {
+                stkConfig.IsEnabled = true;
+                ViewModel.Message = "就绪";
+            }
         }
     }
 
