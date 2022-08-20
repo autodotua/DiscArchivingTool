@@ -14,19 +14,9 @@ using static DiscArchivingTool.App;
 
 namespace DiscArchivingTool
 {
-    public class PackingUtility
+    public class PackingUtility: DiscUtilityBase
     {
-        /// <summary>
-        /// 停止导出（打包）
-        /// </summary>
-        public void StopExporting()
-        {
-            stoppingExport = true;
-        }
-        /// <summary>
-        /// 已经收到停止导出信号
-        /// </summary>
-        private bool stoppingExport = false;
+
         /// <summary>
         /// 根据时间顺序从早到晚排序后的文件
         /// </summary>
@@ -176,7 +166,7 @@ namespace DiscArchivingTool
             double totalLength = Packages.DiscFilePackages
                 .Where(p => p.Checked && p.Index > 0)
                 .Sum(p => p.Files.Sum(q => q.Length));
-            stoppingExport = false;
+            stopping = false;
             foreach (var package in Packages.DiscFilePackages.Where(p => p.Checked && p.Index > 0))
             {
                 string dir = Path.Combine(distDir, package.Index.ToString());
@@ -209,14 +199,14 @@ namespace DiscArchivingTool
                                 string md5 = null;
                                 if (createISO)
                                 {
-                                    MessageReceived?.Invoke(this, new MessageEventArgs($"正在处理第 {package.Index} 个光盘文件包中的 {relativePath}"));
+                                    InvokeMessageReceivedEvent($"正在处理第 {package.Index} 个光盘文件包中的 {relativePath}");
                                     builder.AddFile(newName, file.Path);
-                                    md5 = FileUtility.GetMD5(file.Path);
+                                    md5 = GetMD5(file.Path);
                                 }
                                 else
                                 {
-                                    MessageReceived?.Invoke(this, new MessageEventArgs($"正在复制第 {package.Index} 个光盘文件包中的 {relativePath}"));
-                                    md5 = FileUtility.CopyAndGetHash(file.Path, Path.Combine(dir, newName));
+                                    InvokeMessageReceivedEvent($"正在复制第 {package.Index} 个光盘文件包中的 {relativePath}");
+                                    md5 = CopyAndGetHash(file.Path, Path.Combine(dir, newName));
                                 }
 
                                 writer.WriteLine($"{newName}\t{relativePath}\t{file.LastWriteTime.ToString(DateTimeFormat)}\t{file.Length}\t{md5}");
@@ -239,7 +229,7 @@ namespace DiscArchivingTool
                                 }
                             }
                         } while (retry);
-                        if (abort || stoppingExport)
+                        if (abort || stopping)
                         {
                             throw new OperationCanceledException();
                         }
@@ -249,7 +239,7 @@ namespace DiscArchivingTool
                 }
                 if (createISO)
                 {
-                    MessageReceived?.Invoke(this, new MessageEventArgs($"正在创第 {package.Index} 个ISO"));
+                    InvokeMessageReceivedEvent($"正在创第 {package.Index} 个ISO");
                     builder.AddFile(fileListName, Path.Combine(dir, fileListName));
                     builder.Build(Path.Combine(Path.GetDirectoryName(dir), Path.GetFileName(dir) + ".iso"));
 
@@ -257,7 +247,6 @@ namespace DiscArchivingTool
             }
         }
 
-        public event EventHandler<MessageEventArgs> MessageReceived;
         public event EventHandler<ProgressUpdatedEventArgs> RebuildProgressUpdated;
 
     }

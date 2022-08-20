@@ -5,11 +5,9 @@ using static DiscArchivingTool.App;
 
 namespace DiscArchivingTool
 {
-    public class RebuildUtility
+    public class RebuildUtility:DiscUtilityBase
     {
         private Dictionary<string, List<DiscFile>> files;
-        public event EventHandler<MessageEventArgs> MessageReceived;
-
         public event EventHandler<ProgressUpdatedEventArgs> RebuildProgressUpdated;
 
         /// <summary>
@@ -51,9 +49,9 @@ namespace DiscArchivingTool
             return tree;
         }
 
-        public void ReadFileList(string dirs)
+        public  void InitFileList(string dirs)
         {
-            files = FileUtility.ReadFileList(dirs);
+            files = ReadFileList(dirs);
         }
         /// <summary>
         /// 进行重建
@@ -62,6 +60,7 @@ namespace DiscArchivingTool
         /// <returns></returns>
         public int Rebuild(string distDir, bool overrideWhenExisted, out List<RebuildError> errorFiles)
         {
+            stopping= false;
             errorFiles = new List<RebuildError>();
             double length = 0;
             double totalLength = files.Values.Sum(p => p.Sum(q => q.Length));
@@ -76,7 +75,7 @@ namespace DiscArchivingTool
                         var distPath = Path.Combine(distDir, file.Path);
                         var distFileDir = Path.GetDirectoryName(distPath);
                         var name = Path.GetFileName(file.Path);
-                        MessageReceived?.Invoke(this, new MessageEventArgs($"正在重建 {file.Path}"));
+                        InvokeMessageReceivedEvent($"正在重建 {file.Path}");
                         if (!Directory.Exists(distFileDir))
                         {
                             Directory.CreateDirectory(distFileDir);
@@ -85,7 +84,7 @@ namespace DiscArchivingTool
                         {
                             throw new Exception("文件已存在");
                         }
-                        string md5 = FileUtility.CopyAndGetHash(srcPath, distPath);
+                        string md5 = CopyAndGetHash(srcPath, distPath);
                         if (md5 != file.Md5)
                         {
                             throw new Exception("MD5验证失败");
@@ -101,6 +100,10 @@ namespace DiscArchivingTool
                         errorFiles.Add(new RebuildError(file, ex.Message));
                     }
                     RebuildProgressUpdated?.Invoke(this, new ProgressUpdatedEventArgs(length += file.Length, totalLength));
+                    if(stopping)
+                    {
+                        throw new OperationCanceledException();
+                    }
                 }
             }
             return count;

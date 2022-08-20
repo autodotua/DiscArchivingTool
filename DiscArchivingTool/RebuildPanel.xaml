@@ -170,10 +170,13 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock
                 Width="360"
                 Text="{Binding Message}"
+                VerticalAlignment="Center"
                 TextTrimming="CharacterEllipsis"
                 ToolTip="{Binding Message}" />
             <ProgressBar
@@ -186,6 +189,13 @@
                 VerticalAlignment="Center"
                 Content="文件已存在时覆盖"
                 IsChecked="{Binding OverrideWhenExisted}" />
+            <Button
+                x:Name="btnStop"
+                Grid.Column="6"
+                Padding="32,4"
+                Click="BtnStop_Click"
+                Content="停止"
+                IsEnabled="False" />
             <Button
                 x:Name="btnRebuild"
                 Grid.Column="99"

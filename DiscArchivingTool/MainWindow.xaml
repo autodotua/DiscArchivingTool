@@ -9,7 +9,9 @@
     Title="光盘归档工具"
     Width="1200"
     Height="800"
-    ui:TitleBar.ExtendViewIntoTitleBar="True"
+    ui:TitleBar.Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+    ui:TitleBar.ExtendViewIntoTitleBar="False"
+    ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     Closing="Window_Closing"
     WindowState="Maximized"
@@ -22,7 +24,8 @@
         <Border
             Padding="12,0,144,0"
             Panel.ZIndex="100"
-            Background="{DynamicResource SystemControlBackgroundBaseLowBrush}">
+            Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+            Visibility="Collapsed">
             <Grid x:Name="AppTitleBar">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -72,6 +75,15 @@
             </TabItem>
             <TabItem Header=" 更新 ">
                 <local:UpdatePanel x:Name="update" />
+            </TabItem>
+            <TabItem Header=" 关于 ">
+                <ui:SimpleStackPanel
+                    Margin="8"
+                    Orientation="Vertical"
+                    Spacing="8">
+                    <TextBlock Text="autodotua" />
+                    <ui:HyperlinkButton NavigateUri="https://github.com/autodotua/DiscArchivingTool">Github</ui:HyperlinkButton>
+                </ui:SimpleStackPanel>
             </TabItem>
         </TabControl>
     </Grid>

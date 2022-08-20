@@ -65,7 +65,7 @@ namespace DiscArchivingTool
                 ViewModel.Message = "正在重建分析";
                 await Task.Run(() =>
                 {
-                    ru.ReadFileList(ViewModel.InputDir);
+                    ru.InitFileList(ViewModel.InputDir);
                     ViewModel.FileTree = ru.BuildTree();
                 });
                 btnRebuild.IsEnabled = true;
@@ -87,7 +87,9 @@ namespace DiscArchivingTool
             {
                 ViewModel.RebuildErrors.Clear();
                 stkConfig.IsEnabled = false;
+                btnStop.IsEnabled = true;
                 btnRebuild.IsEnabled = false;
+                ViewModel.Progress = 0;
                 int count = 0;
                 await Task.Run(() =>
                   {
@@ -100,10 +102,15 @@ namespace DiscArchivingTool
                     await CommonDialog.ShowOkDialogAsync("重建成功",$"共{count}个文件");
                 }
             }
+            catch (OperationCanceledException)
+            {
+
+            }
             finally
             {
                 stkConfig.IsEnabled = true;
                 btnRebuild.IsEnabled = true;
+                btnStop.IsEnabled = false;
                 ViewModel.Message = "就绪";
                 ViewModel.Progress = ViewModel.ProgressMax;
             }
@@ -133,6 +140,12 @@ namespace DiscArchivingTool
                     }
                 }
             }
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            btnStop.IsEnabled = false;
+            ru.Stop();
         }
     }
 

@@ -48,6 +48,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     Width="360"
@@ -67,8 +69,15 @@
                     Content="仅显示校验失败的文件"
                     Unchecked="ChkErrorOnly_Checked" />
                 <Button
-                    x:Name="btnCheck"
+                    x:Name="btnStop"
                     Grid.Column="6"
+                    Padding="32,4"
+                    Click="BtnStop_Click"
+                    Content="停止"
+                    IsEnabled="False" />
+                <Button
+                    x:Name="btnCheck"
+                    Grid.Column="8"
                     Padding="32,4"
                     Click="BtnCheck_Click"
                     Content="校验" />

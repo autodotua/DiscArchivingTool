@@ -10,13 +10,22 @@ using static DiscArchivingTool.App;
 
 namespace DiscArchivingTool
 {
-    public class UpdateUtility
+    public class UpdateUtility : DiscUtilityBase
     {
         public List<UpdatingDiscFile> UpdatingDiscFiles { get; private set; }
         private List<DiscFile> discFiles;
+
+        /// <summary>
+        /// 搜索光盘和参考目录中的文件，进行匹配和属性差异查询
+        /// </summary>
+        /// <param name="discDir"></param>
+        /// <param name="referenceDir"></param>
+        /// <param name="byName"></param>
+        /// <param name="byTime"></param>
+        /// <param name="byLength"></param>
         public void Search(string discDir, string referenceDir, bool byName, bool byTime, bool byLength)
         {
-            discFiles = FileUtility.ReadFileList(discDir).Values.Single();
+            discFiles = ReadFileList(discDir).Values.Single();
             var dir = new DirectoryInfo(referenceDir);
             Dictionary<long, object> time2file = new Dictionary<long, object>();
             Dictionary<string, object> name2file = new Dictionary<string, object>();
@@ -29,7 +38,7 @@ namespace DiscArchivingTool
                 }
                 if (byTime)
                 {
-                    AddToDictionary(time2file, file.LastWriteTime.Ticks/10000000L, file);
+                    AddToDictionary(time2file, file.LastWriteTime.Ticks / 10000000L, file);
                 }
                 if (byLength)
                 {
@@ -201,6 +210,11 @@ namespace DiscArchivingTool
             }
         }
 
+        /// <summary>
+        /// 生成新的FileList
+        /// </summary>
+        /// <param name="outputDir"></param>
+        /// <exception cref="Exception"></exception>
         public void Update(string outputDir)
         {
             var groups = UpdatingDiscFiles.Where(p => p.Checked).GroupBy(p => p.DiscFile.DiscName);

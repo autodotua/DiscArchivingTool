@@ -100,6 +100,7 @@ namespace DiscArchivingTool
                 btnExport.IsEnabled = false;
                 stkConfig.IsEnabled = false;
                 btnStopExport.IsEnabled = true;
+                ViewModel.Progress = 0;
                 bool ok = true;
                 if (Directory.EnumerateFileSystemEntries(ViewModel.OutputDir).Any())
                 {
@@ -170,7 +171,7 @@ namespace DiscArchivingTool
 
         private void StopExportButton_Click(object sender, RoutedEventArgs e)
         {
-            fu.StopExporting();
+            fu.Stop();
             btnStopExport.IsEnabled = false;
         }
 

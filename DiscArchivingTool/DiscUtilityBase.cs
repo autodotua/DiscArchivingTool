@@ -2,11 +2,29 @@
 using System.IO;
 using System.Security.Cryptography;
 using static DiscArchivingTool.App;
+
 namespace DiscArchivingTool
 {
-    public static class FileUtility
+    public class DiscUtilityBase
     {
-        public static string GetMD5(string file)
+        /// <summary>
+        /// 已经收到停止导出信号
+        /// </summary>
+        protected bool stopping = false;
+        /// <summary>
+        /// 停止导出（打包）
+        /// </summary>
+        public void Stop()
+        {
+            stopping = true;
+        }
+        public event EventHandler<MessageEventArgs> MessageReceived;
+
+        protected void InvokeMessageReceivedEvent(string message)
+        {
+            MessageReceived?.Invoke(this, new MessageEventArgs(message));
+        }
+        protected string GetMD5(string file)
         {
             using MD5 md5 = MD5.Create();
             using var stream = File.OpenRead(file);
@@ -20,7 +38,7 @@ namespace DiscArchivingTool
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public static string CopyAndGetHash(string from, string to)
+        protected string CopyAndGetHash(string from, string to)
         {
             int bufferSize = 1024 * 1024; //1MB的缓冲区
             using MD5 md5 = MD5.Create();
@@ -74,7 +92,7 @@ namespace DiscArchivingTool
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         /// <exception cref="FormatException"></exception>
-        public static Dictionary<string, List<DiscFile>> ReadFileList(string dirs)
+        protected Dictionary<string, List<DiscFile>> ReadFileList(string dirs)
         {
             Dictionary<string, List<DiscFile>> files = new Dictionary<string, List<DiscFile>>();
             foreach (var dir in dirs.Split('|'))
@@ -112,6 +130,8 @@ namespace DiscArchivingTool
             }
             return files;
         }
-
     }
+
 }
+
+

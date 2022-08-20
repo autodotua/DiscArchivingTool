@@ -44,12 +44,18 @@ namespace DiscArchivingTool
             try
             {
                 btnCheck.IsEnabled = false;
+                btnStop.IsEnabled = true;
+                ViewModel.Progress = 0;
                 ViewModel.Message = "正在校验";
                 await Task.Run(() =>
                 {
-                    cu.ReadFileList(ViewModel.Dir);
+                    cu.InitFileList(ViewModel.Dir);
                     ViewModel.CheckResults = cu.Check();
                 });
+            }
+            catch (OperationCanceledException)
+            {
+
             }
             catch (Exception ex)
             {
@@ -58,6 +64,7 @@ namespace DiscArchivingTool
             finally
             {
                 btnCheck.IsEnabled = true;
+                btnStop.IsEnabled = false;
                 ViewModel.Message = "就绪";
             }
         }
@@ -84,6 +91,12 @@ namespace DiscArchivingTool
             {
                 lvwResults.ItemsSource = ViewModel.CheckResults;
             }
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            btnStop.IsEnabled = false;
+            cu.Stop();
         }
     }
 
