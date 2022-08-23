@@ -59,6 +59,16 @@ namespace DiscArchivingTool
 
         private async void BtnAnalyze_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(ViewModel.InputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("光盘目录为空");
+                return;
+            }
+            if (!Directory.Exists(ViewModel.InputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("光盘目录不存在");
+                return;
+            }
             try
             {
                 btnAnalyze.IsEnabled = btnRebuild.IsEnabled = false;
@@ -83,6 +93,21 @@ namespace DiscArchivingTool
 
         private async void BtnRebuild_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(ViewModel.OutputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("重建目录为空");
+                return;
+            }
+            if (!Directory.Exists(ViewModel.OutputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("重建目录不存在");
+                return;
+            }
+            if(ViewModel.FileTree.Count==0)
+            {
+                await CommonDialog.ShowErrorDialogAsync("没有任何需要重建的文件");
+                return;
+            }
             try
             {
                 ViewModel.RebuildErrors.Clear();
@@ -96,12 +121,19 @@ namespace DiscArchivingTool
                       count = ru.Rebuild(ViewModel.OutputDir,ViewModel.OverrideWhenExisted,out List<RebuildError> rebuildErrors);
                       ViewModel.RebuildErrors = rebuildErrors;
                   });
-
-                if (ViewModel.RebuildErrors.Count == 0)
-                {
-                    await CommonDialog.ShowOkDialogAsync("重建成功",$"共{count}个文件");
+                    if (count == 0)
+                    {
+                        await CommonDialog.ShowOkDialogAsync("重建完成", $"没有任何文件被重建");
+                    }
+                    else
+                    {
+                        if (ViewModel.RebuildErrors.Count == 0)
+                        {
+                            await CommonDialog.ShowOkDialogAsync("重建成功", $"共{count}个文件");
+                        }
+                        btnRebuild.IsEnabled = true;
+                    }
                 }
-            }
             catch (OperationCanceledException)
             {
 
@@ -109,7 +141,6 @@ namespace DiscArchivingTool
             finally
             {
                 stkConfig.IsEnabled = true;
-                btnRebuild.IsEnabled = true;
                 btnStop.IsEnabled = false;
                 ViewModel.Message = "就绪";
                 ViewModel.Progress = ViewModel.ProgressMax;

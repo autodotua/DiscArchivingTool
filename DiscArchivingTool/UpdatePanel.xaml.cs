@@ -60,6 +60,26 @@ namespace DiscArchivingTool
 
         private async void BtnSearch_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(ViewModel.InputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("光盘目录为空");
+                return;
+            }
+            if (!Directory.Exists(ViewModel.InputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("光盘目录不存在");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(ViewModel.SourceDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("参照目录为空");
+                return;
+            }
+            if (!Directory.Exists(ViewModel.SourceDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("参照目录不存在");
+                return;
+            }
             try
             {
                 stkConfig.IsEnabled=btnUpdate.IsEnabled = false;
@@ -87,6 +107,16 @@ namespace DiscArchivingTool
 
         private async void BtnUpdate_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(ViewModel.OutputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("更新目录为空");
+                return;
+            }
+            if (!Directory.Exists(ViewModel.OutputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("更新目录不存在");
+                return;
+            }
             try
             {
                 stkConfig.IsEnabled = btnUpdate.IsEnabled = false;

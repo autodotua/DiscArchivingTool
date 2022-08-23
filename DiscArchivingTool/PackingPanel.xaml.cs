@@ -54,6 +54,26 @@ namespace DiscArchivingTool
 
         private async void CheckButton_Click(object sender, RoutedEventArgs e)
         {
+            if(string.IsNullOrWhiteSpace(ViewModel.Dir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("源目录为空");
+                return;
+            }
+            if(!Directory.Exists(ViewModel.Dir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("源目录不存在");
+                return;
+            }
+            if(ViewModel.DiscSize<100)
+            {
+                await CommonDialog.ShowErrorDialogAsync("单盘容量过小");
+                return;
+            }
+            if(ViewModel.MaxDiscCount<1)
+            {
+                await CommonDialog.ShowErrorDialogAsync("盘片数量应大于等于1盘");
+                return;
+            }
             try
             {
                 btnCheck.IsEnabled = false;
@@ -95,6 +115,21 @@ namespace DiscArchivingTool
 
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(ViewModel.OutputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("导出目录为空");
+                return;
+            }
+            if (!Directory.Exists(ViewModel.OutputDir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("导出目录不存在");
+                return;
+            }
+            if(!ViewModel.DiscFilePackages.Any(p=>p.Checked))
+            {
+                await CommonDialog.ShowErrorDialogAsync("没有任何被选中的文件包");
+                return;
+            }
             try
             {
                 btnExport.IsEnabled = false;

@@ -41,6 +41,16 @@ namespace DiscArchivingTool
 
         private async void BtnCheck_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(ViewModel.Dir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("光盘目录为空");
+                return;
+            }
+            if (!Directory.Exists(ViewModel.Dir))
+            {
+                await CommonDialog.ShowErrorDialogAsync("光盘目录不存在");
+                return;
+            }
             try
             {
                 btnCheck.IsEnabled = false;

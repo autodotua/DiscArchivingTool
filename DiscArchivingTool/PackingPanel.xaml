@@ -90,7 +90,7 @@
                 <TextBlock
                     Grid.Column="8"
                     VerticalAlignment="Center"
-                    Text="单盘大小（GB）：" />
+                    Text="单盘容量（MB）：" />
                 <ComboBox
                     Grid.Column="10"
                     IsEditable="True"
