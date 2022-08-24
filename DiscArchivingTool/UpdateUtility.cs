@@ -12,9 +12,8 @@ namespace DiscArchivingTool
 {
     public class UpdateUtility : DiscUtilityBase
     {
-        public List<UpdatingDiscFile> UpdatingDiscFiles { get; private set; }
         private List<DiscFile> discFiles;
-
+        public List<UpdatingDiscFile> UpdatingDiscFiles { get; private set; }
         /// <summary>
         /// 搜索光盘和参考目录中的文件，进行匹配和属性差异查询
         /// </summary>

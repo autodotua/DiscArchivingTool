@@ -40,7 +40,7 @@ namespace DiscArchivingTool
     public class PackingConfigs
     {
         public string BlackList { get; set; } = $"Thumbs.db{Environment.NewLine}desktop.ini";
-        public bool CreateISO { get; set; } = false;
+        public PackingType PackingType;
         public string Dir { get; set; }
         public string OutputDir { get; set; }
         public int DiscSize { get; set; } = 4480;

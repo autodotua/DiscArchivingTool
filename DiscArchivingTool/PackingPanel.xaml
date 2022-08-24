@@ -336,10 +336,18 @@
                 VerticalAlignment="Center"
                 Maximum="{Binding ProgressMax}"
                 Value="{Binding Progress}" />
-            <CheckBox
+            <ComboBox
                 Grid.Column="4"
-                Content="生成ISO"
-                IsChecked="{Binding CreateISO}" />
+                ItemsSource="{Binding PackingTypes}"
+                SelectedItem="{Binding PackingType}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Width="80 "
+                            Text="{Binding ., Converter={StaticResource DescriptionConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
             <Button
                 x:Name="btnStopExport"
                 Grid.Column="6"

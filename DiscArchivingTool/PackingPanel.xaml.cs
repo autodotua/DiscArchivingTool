@@ -7,6 +7,7 @@ using System.IO;
 using ModernWpf.FzExtension.CommonDialog;
 using DiscArchivingTool;
 using static DiscArchivingTool.App;
+using System.Collections;
 
 namespace DiscArchivingTool
 {
@@ -49,6 +50,39 @@ namespace DiscArchivingTool
             if (path != null)
             {
                 ViewModel.OutputDir = path;
+            }
+        }
+
+        private void BtnSelect_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.DiscFilePackages == null)
+            {
+                return;
+            }
+            switch ((sender as Button).Tag as string)
+            {
+                case "1":
+                    foreach (var package in ViewModel.DiscFilePackages)
+                    {
+                        package.Checked = true;
+                    }
+                    break;
+                case "2":
+                    foreach (var package in ViewModel.DiscFilePackages)
+                    {
+                        package.Checked = false;
+                    }
+                    break;
+                case "3":
+                    foreach (var package in ViewModel.DiscFilePackages)
+                    {
+                        package.Checked = false;
+                    }
+                    foreach (DiscFilePackage package in lvwPackages.SelectedItems)
+                    {
+                        package.Checked = true;
+                    }
+                    break;
             }
         }
 
@@ -166,7 +200,7 @@ namespace DiscArchivingTool
 
                         await Task.Run(async () =>
                         {
-                            await fu.ExportAsync(ViewModel.OutputDir, ViewModel.CreateISO, async msg =>
+                            await fu.ExportAsync(ViewModel.OutputDir, ViewModel.PackingType, async msg =>
                              {
                                  int id = 0;
                                  await Dispatcher.Invoke(async () =>
@@ -209,63 +243,25 @@ namespace DiscArchivingTool
             fu.Stop();
             btnStopExport.IsEnabled = false;
         }
-
-        private void BtnSelect_Click(object sender, RoutedEventArgs e)
-        {
-            if (ViewModel.DiscFilePackages == null)
-            {
-                return;
-            }
-            switch ((sender as Button).Tag as string)
-            {
-                case "1":
-                    foreach (var package in ViewModel.DiscFilePackages)
-                    {
-                        package.Checked = true;
-                    }
-                    break;
-                case "2":
-                    foreach (var package in ViewModel.DiscFilePackages)
-                    {
-                        package.Checked = false;
-                    }
-                    break;
-                case "3":
-                    foreach (var package in ViewModel.DiscFilePackages)
-                    {
-                        package.Checked = false;
-                    }
-                    foreach (DiscFilePackage package in lvwPackages.SelectedItems)
-                    {
-                        package.Checked = true;
-                    }
-                    break;
-            }
-        }
     }
 
 
     public class PackingPanelViewModel : INotifyPropertyChanged
     {
         private string blackList = $"Thumbs.db{Environment.NewLine}desktop.ini";
-        private bool createISO;
         private string dir;
         private List<DiscFilePackage> discFilePackages;
-
         private int discSize = 4480;
         private DateTime earliestDateTime = new DateTime(1, 1, 1);
-
         private int maxDiscCount = 1000;
-
         private string message = "就绪";
-
         private string outputDir;
+        private PackingType packingType = PackingType.Copy;
         private double progress;
         private double progressMax;
         private DiscFilePackage selectedPackage;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         public string BlackList
         {
             get => blackList;
@@ -273,17 +269,12 @@ namespace DiscArchivingTool
         }
 
         public bool BlackListUseRegex { get; set; } = false;
-
-        public bool CreateISO
-        {
-            get => createISO;
-            set => this.SetValueAndNotify(ref createISO, value, nameof(CreateISO));
-        }
         public string Dir
         {
             get => dir;
             set => this.SetValueAndNotify(ref dir, value, nameof(Dir));
         }
+
         public List<DiscFilePackage> DiscFilePackages
         {
             get => discFilePackages;
@@ -297,7 +288,6 @@ namespace DiscArchivingTool
         }
 
         public int[] DiscSizes { get; } = new int[] { 700, 4480, 8500, 23500 };
-
         public DateTime EarliestDateTime
         {
             get => earliestDateTime;
@@ -321,6 +311,14 @@ namespace DiscArchivingTool
             get => outputDir;
             set => this.SetValueAndNotify(ref outputDir, value, nameof(OutputDir));
         }
+
+        public PackingType PackingType
+        {
+            get => packingType;
+            set => this.SetValueAndNotify(ref packingType, value, nameof(PackingType));
+        }
+
+        public IEnumerable PackingTypes => Enum.GetValues(typeof(PackingType));
         public double Progress
         {
             get => progress;

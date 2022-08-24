@@ -10,6 +10,7 @@
     Width="1200"
     Height="800"
     ui:TitleBar.Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+    ui:TitleBar.InactiveBackground="{DynamicResource SystemControlBackgroundBaseLowBrush}"
     ui:TitleBar.ExtendViewIntoTitleBar="False"
     ui:TitleBar.IsIconVisible="True"
     ui:WindowHelper.UseModernWindowStyle="True"
